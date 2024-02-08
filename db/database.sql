@@ -1,54 +1,22 @@
--- CREATE DATABASE IF NOT EXISTS companydb;
 
--- USE companydb;
-
-CREATE TABLE employee (
-  id INT(11) NOT NULL AUTO_INCREMENT,
-  name VARCHAR(45) DEFAULT NULL,
-  salary INT(11) DEFAULT NULL, 
-  PRIMARY KEY(id)
+CREATE TABLE Usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    correo VARCHAR(255) NOT NULL UNIQUE,
+    contraseña VARCHAR(255) NOT NULL,
+    rol ENUM('administrador', 'usuario') NOT NULL
 );
 
-DESCRIBE employee;
 
-INSERT INTO employee values 
-  (1, 'Ryan Ray', 20000),
-  (2, 'Joe McMillan', 40000),
-  (3, 'John Carter', 50000);
-
-SELECT * FROM employee;
-
-
-
-ALTER TABLE MantenimientoVehiculos
-MODIFY COLUMN id INT AUTO_INCREMENT;
-
-
-
-
-CREATE TABLE Vehiculos (
-    ID INT PRIMARY KEY,
-    Marca VARCHAR(255),
-    Descripcion VARCHAR(255),
-    Imagen BLOB,
-    Modelo VARCHAR(255),
-    Placa VARCHAR(20),
-    AnioFabricacion INT,
-    CapacidadCarga DECIMAL(10, 2),
-    TipoCombustible VARCHAR(20),
-    EstadoVehiculo VARCHAR(20),
-    KilometrajeActual INT
+CREATE TABLE links(
+ id INT(11) NOT NULL,
+ title VARCHAR(150) NOT NULL,
+ url VARCHAR(255) NOT NULL,
+ description TEXT,
+ usuarios_id INT(11) NOT NULL, -- Asegúrate de que no permita valores nulos
+ create_at TIMESTAMP NOT NULL DEFAULT current_timestamp,
+ CONSTRAINT fk_usuarios FOREIGN KEY (usuarios_id) REFERENCES Usuarios(id) -- Asegúrate de que el nombre de la tabla sea 'Usuarios' y no 'usuarios'
 );
 
-###Pendiente de hacer el controlador
-CREATE TABLE AsignacionGasolina (
-    ID INT PRIMARY KEY,
-    VehiculoID INT,
-    CodigoUnico VARCHAR(20),
-    NumeroVehiculo VARCHAR(20),
-    PlacaVehiculo VARCHAR(20),
-    GalonesAsignados DECIMAL(8, 2),
-    Imagen BLOB,
-    Descripcion TEXT
-);
 
+ALTER TABLE links ADD PRIMARY KEY(id);
