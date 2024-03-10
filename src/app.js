@@ -5,6 +5,7 @@ import cors from "cors";
 
 import indexRoutes from "./routes/index.routes.js";
 import dataRoute from './routes/spr.routes.js';
+import dataJsonRoute from "./routes/sprJsonRelacional.routes.js"
 // import loginRoute from './routes/login.routes.js';
 import linksRoute from './routes/links.routes.js';
 import registerRoute from './routes/register.routes.js';
@@ -20,6 +21,7 @@ app.use(express.json());
 
 // Route universal routes
 app.use("/api",dataRoute);
+app.use("/api", dataJsonRoute)
 
 // Routes for the main page
 app.use("/", indexRoutes);
