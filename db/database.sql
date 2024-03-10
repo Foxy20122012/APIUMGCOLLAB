@@ -53,6 +53,11 @@ CREATE TABLE Temas (
 );
 
 
+//Datos de prueba
+//Curso
+INSERT INTO Cursos (codigo, nombre, descripcion, creditos, semestre)
+VALUES ('IA101', 'Inteligencia Artificial', 'Curso sobre los fundamentos y aplicaciones de la inteligencia artificial.', 4, 6);
+
 
 
 
@@ -71,3 +76,4 @@ CREATE TABLE links(
 
 
 ALTER TABLE links ADD PRIMARY KEY(id);
+
