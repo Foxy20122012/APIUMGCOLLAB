@@ -11,6 +11,7 @@ import linksRoute from './routes/links.routes.js';
 import registerRoute from './routes/register.routes.js';
 import loginAdminRoute from './routes/loginAdmin.routes.js';
 import loginUsuarioRoute from './routes//loginUsuario.routes.js';
+import cursosRoute from "./routes/cursos.routes.js"
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(express.json());
 // Route universal routes
 app.use("/api",dataRoute);
 app.use("/api", dataJsonRoute)
+app.use("/api", cursosRoute)
 
 // Routes for the main page
 app.use("/", indexRoutes);
