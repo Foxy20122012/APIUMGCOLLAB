@@ -5,6 +5,7 @@ export const getCoursesWithTopics = async (req, res) => {
         const [courses] = await pool.query(`
             SELECT 
                 Cursos.id AS CursoId,
+                Cursos.codigo AS codigo,
                 Cursos.nombre AS Curso,
                 Cursos.descripcion AS DescripcionCurso,
                 Cursos.semestre AS Semestre,
