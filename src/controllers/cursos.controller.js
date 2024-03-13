@@ -85,3 +85,50 @@ export const deleteCourse = async (req, res) => {
         res.status(500).send('Error al eliminar el curso');
     }
 }
+
+
+export const getCourseById = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [course] = await pool.query(`
+            SELECT 
+                Cursos.id AS CursoId,
+                Cursos.codigo AS codigo,
+                Cursos.nombre AS Curso,
+                Cursos.descripcion AS DescripcionCurso,
+                Cursos.semestre AS Semestre,
+                Cursos.creditos AS Creditos,
+                JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'id', Temas.id,
+                        'nombre', Temas.nombre,
+                        'descripcion', Temas.descripcion,
+                        'curso_id', Temas.curso_id
+                    )
+                ) AS Temas
+            FROM 
+                Cursos
+            LEFT JOIN 
+                Temas ON Cursos.id = Temas.curso_id
+            WHERE Cursos.id = ?
+            GROUP BY Cursos.id
+        `, [id]);
+
+        if (course.length === 0) {
+            return res.status(404).send('Curso no encontrado');
+        }
+
+        // Convertir la cadena de 'Temas' en un arreglo de objetos JSON para el curso
+        const courseWithTopics = {
+            ...course[0],
+            Temas: JSON.parse(course[0].Temas || '[]')
+        };
+
+        res.json(courseWithTopics);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al obtener el curso');
+    }
+};
+
