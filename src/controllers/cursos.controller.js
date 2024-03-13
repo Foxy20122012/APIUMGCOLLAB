@@ -38,3 +38,50 @@ export const getCoursesWithTopics = async (req, res) => {
         res.status(500).send('Error al obtener los cursos y temas');
     }
 }
+
+export const updateCourse = async (req, res) => {
+    const { id } = req.params;
+    const { codigo, nombre, descripcion, semestre, creditos } = req.body;
+
+    try {
+        const [result] = await pool.query(`
+            UPDATE Cursos
+            SET 
+                codigo = ?,
+                nombre = ?,
+                descripcion = ?,
+                semestre = ?,
+                creditos = ?
+            WHERE id = ?
+        `, [codigo, nombre, descripcion, semestre, creditos, id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send('Curso no encontrado');
+        }
+
+        res.send('Curso actualizado con éxito');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al actualizar el curso');
+    }
+}
+
+export const deleteCourse = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [result] = await pool.query(`
+            DELETE FROM Cursos
+            WHERE id = ?
+        `, [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send('Curso no encontrado');
+        }
+
+        res.send('Curso eliminado con éxito');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al eliminar el curso');
+    }
+}
