@@ -10,7 +10,7 @@ router.get('/cursos', getCoursesWithTopics);
 router.get('/cursos/:id', getCourseById);
 
 // Actualizar un curso específico por su ID
-router.put('/cursos/:CursoId', updateCourse);
+router.put('/cursos/:id', updateCourse);
 
 
 // Eliminar un curso específico por su ID

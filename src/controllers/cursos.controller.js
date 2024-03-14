@@ -4,12 +4,12 @@ export const getCoursesWithTopics = async (req, res) => {
     try {
         const [courses] = await pool.query(`
             SELECT 
-                Cursos.id AS CursoId,
-                Cursos.codigo AS codigo,
-                Cursos.nombre AS Curso,
-                Cursos.descripcion AS DescripcionCurso,
-                Cursos.semestre AS Semestre,
-                Cursos.creditos AS Creditos,
+                Cursos.id,
+                Cursos.codigo,
+                Cursos.nombre,
+                Cursos.descripcion,
+                Cursos.semestre,
+                Cursos.creditos,
                 JSON_ARRAYAGG(
                     JSON_OBJECT(
                         'id', Temas.id,
@@ -17,7 +17,7 @@ export const getCoursesWithTopics = async (req, res) => {
                         'descripcion', Temas.descripcion,
                         'curso_id', Temas.curso_id
                     )
-                ) AS Temas
+                ) AS temas
             FROM 
                 Cursos
             LEFT JOIN 
@@ -26,10 +26,10 @@ export const getCoursesWithTopics = async (req, res) => {
                 Cursos.id
         `);
 
-        // Convertir la cadena de 'Temas' en un arreglo de objetos JSON para cada curso
+        // Convertir la cadena de 'temas' en un arreglo de objetos JSON para cada curso
         const coursesWithTopics = courses.map(course => ({
             ...course,
-            Temas: JSON.parse(course.Temas || '[]')
+            temas: JSON.parse(course.temas || '[]')
         }));
 
         res.json(coursesWithTopics);
@@ -40,7 +40,7 @@ export const getCoursesWithTopics = async (req, res) => {
 }
 
 export const updateCourse = async (req, res) => {
-    const { CursoId } = req.params;
+    const { id } = req.params;
     const { codigo, nombre, descripcion, semestre, creditos } = req.body;
 
     try {
@@ -53,7 +53,7 @@ export const updateCourse = async (req, res) => {
                 semestre = ?,
                 creditos = ?
             WHERE id = ?
-        `, [codigo, nombre, descripcion, semestre, creditos, CursoId]);
+        `, [codigo, nombre, descripcion, semestre, creditos, id]);
 
         if (result.affectedRows === 0) {
             return res.status(404).send('Curso no encontrado');
@@ -66,26 +66,6 @@ export const updateCourse = async (req, res) => {
     }
 }
 
-
-export const deleteCourse = async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const [result] = await pool.query(`
-            DELETE FROM Cursos
-            WHERE id = ?
-        `, [id]);
-
-        if (result.affectedRows === 0) {
-            return res.status(404).send('Curso no encontrado');
-        }
-
-        res.send('Curso eliminado con éxito');
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Error al eliminar el curso');
-    }
-}
 
 
 export const getCourseById = async (req, res) => {
