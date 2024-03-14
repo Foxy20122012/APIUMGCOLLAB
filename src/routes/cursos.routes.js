@@ -10,7 +10,8 @@ router.get('/cursos', getCoursesWithTopics);
 router.get('/cursos/:id', getCourseById);
 
 // Actualizar un curso específico por su ID
-router.put('/cursos/:id', updateCourse);
+router.put('/api/cursos/:CursoId', updateCourse);
+
 
 // Eliminar un curso específico por su ID
 router.delete('/cursos/:id', deleteCourse);

@@ -40,7 +40,7 @@ export const getCoursesWithTopics = async (req, res) => {
 }
 
 export const updateCourse = async (req, res) => {
-    const { id } = req.params;
+    const { CursoId } = req.params;
     const { codigo, nombre, descripcion, semestre, creditos } = req.body;
 
     try {
@@ -53,7 +53,7 @@ export const updateCourse = async (req, res) => {
                 semestre = ?,
                 creditos = ?
             WHERE id = ?
-        `, [codigo, nombre, descripcion, semestre, creditos, id]);
+        `, [codigo, nombre, descripcion, semestre, creditos, CursoId]);
 
         if (result.affectedRows === 0) {
             return res.status(404).send('Curso no encontrado');
@@ -65,6 +65,7 @@ export const updateCourse = async (req, res) => {
         res.status(500).send('Error al actualizar el curso');
     }
 }
+
 
 export const deleteCourse = async (req, res) => {
     const { id } = req.params;
