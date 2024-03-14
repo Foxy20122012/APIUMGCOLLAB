@@ -67,6 +67,25 @@ export const updateCourse = async (req, res) => {
 }
 
 
+export const deleteCourse = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [result] = await pool.query(`
+            DELETE FROM Cursos
+            WHERE id = ?
+        `, [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send('Curso no encontrado');
+        }
+
+        res.send('Curso eliminado con éxito');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al eliminar el curso');
+    }
+}
 
 export const getCourseById = async (req, res) => {
     const { id } = req.params;
