@@ -12,6 +12,7 @@ import registerRoute from './routes/register.routes.js';
 import loginAdminRoute from './routes/loginAdmin.routes.js';
 import loginUsuarioRoute from './routes//loginUsuario.routes.js';
 import cursosRoute from "./routes/cursos.routes.js"
+import i18nRoute from "./routes/sprI18n.routes.js"
 
 const app = express();
 
@@ -20,8 +21,11 @@ app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
 
-// Route universal routes
+// Route universal routes Stored Procedured
 app.use("/api",dataRoute);
+app.use("/api", i18nRoute)
+
+//Routes related to courses
 app.use("/api", dataJsonRoute)
 app.use("/api", cursosRoute)
 
