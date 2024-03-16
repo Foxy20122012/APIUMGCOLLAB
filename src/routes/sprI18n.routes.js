@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { spController } from '../controllers/sprI18n.controller.js';
+import { spController } from '../controllers/spr/i18n/sprI18n.controller.js';
 
 const router = Router();
 

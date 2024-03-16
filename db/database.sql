@@ -70,6 +70,8 @@ CREATE TABLE Posts (
     FOREIGN KEY (usuario_id) REFERENCES Usuarios(id),
     FOREIGN KEY (curso_id) REFERENCES Cursos(id)
 );
+ALTER TABLE Posts ADD nombre VARCHAR(255) NOT NULL;
+
 
 
 //Tabla de temas
@@ -89,8 +91,39 @@ INSERT INTO Cursos (codigo, nombre, descripcion, creditos, semestre)
 VALUES ('IA101', 'Inteligencia Artificial', 'Curso sobre los fundamentos y aplicaciones de la inteligencia artificial.', 4, 6);
 
 
+//Tabla de estudiantes
 
+CREATE TABLE Estudiantes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    apellido VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE
+);
 
+ALTER TABLE Estudiantes
+ADD COLUMN fecha_nacimiento DATE,
+ADD COLUMN genero VARCHAR(10),
+ADD COLUMN telefono VARCHAR(20),
+ADD COLUMN direccion TEXT;
+
+//Tabla Transcisional para manejar la relacion entre el estudiante el curso y el catedratico_id
+
+CREATE TABLE curso_estudiante (
+    curso_id INT,
+    estudiante_id INT,
+    FOREIGN KEY (curso_id) REFERENCES Cursos(id),
+    FOREIGN KEY (estudiante_id) REFERENCES Estudiantes(id),
+    PRIMARY KEY (curso_id, estudiante_id)
+);
+ALTER TABLE curso_estudiante
+ADD COLUMN nombre_curso VARCHAR(255),
+ADD COLUMN fecha_asignacion DATE,
+ADD COLUMN catedratico_id INT,
+ADD FOREIGN KEY (catedratico_id) REFERENCES catedraticos(id);
+ALTER TABLE curso_estudiante
+ADD COLUMN nombre_estudiante VARCHAR(255)
+ALTER TABLE curso_estudiante
+ADD COLUMN nombre_catedratico VARCHAR(255)
 
 
 

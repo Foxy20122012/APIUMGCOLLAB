@@ -1,4 +1,6 @@
 import { pool } from '../db.js';
+
+
 export const getCoursesWithTopics = async (req, res) => {
     try {
         const [courses] = await pool.query(`

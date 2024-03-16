@@ -1,6 +1,6 @@
 // adminLogout.routes.js
 import express from 'express';
-import { adminLogout } from '../controllers/adminLogout.controller.js';
+import { adminLogout } from '../controllers/login/adminLogout.controller.js';
 
 const router = express.Router();
 
