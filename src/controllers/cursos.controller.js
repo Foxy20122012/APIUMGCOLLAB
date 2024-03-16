@@ -1,5 +1,4 @@
 import { pool } from '../db.js';
-
 export const getCoursesWithTopics = async (req, res) => {
     try {
         const [courses] = await pool.query(`
@@ -17,7 +16,36 @@ export const getCoursesWithTopics = async (req, res) => {
                         'descripcion', Temas.descripcion,
                         'curso_id', Temas.curso_id
                     )
-                ) AS temas
+                ) AS temas,
+                (
+                    SELECT JSON_ARRAYAGG(
+                        JSON_OBJECT(
+                            'id', catedraticos.id,
+                            'nombre', catedraticos.nombre,
+                            'titulo', catedraticos.titulo,
+                            'email', catedraticos.email
+                        )
+                    )
+                    FROM catedraticos
+                    JOIN curso_catedratico ON catedraticos.id = curso_catedratico.catedratico_id
+                    WHERE curso_catedratico.curso_id = Cursos.id
+                ) AS catedraticos,
+                (
+                    SELECT JSON_ARRAYAGG(
+                        JSON_OBJECT(
+                            'id', Posts.id,
+                            'titulo', Posts.titulo,
+                            'contenido', Posts.contenido,
+                            'estado', Posts.estado,
+                            'visible', Posts.visible,
+                            'fecha_creacion', Posts.fecha_creacion,
+                            'fecha_actualizacion', Posts.fecha_actualizacion,
+                            'usuario_id', Posts.usuario_id
+                        )
+                    )
+                    FROM Posts
+                    WHERE Posts.curso_id = Cursos.id
+                ) AS posts
             FROM 
                 Cursos
             LEFT JOIN 
@@ -26,18 +54,22 @@ export const getCoursesWithTopics = async (req, res) => {
                 Cursos.id
         `);
 
-        // Convertir la cadena de 'temas' en un arreglo de objetos JSON para cada curso
-        const coursesWithTopics = courses.map(course => ({
+        // Convertir las cadenas de 'temas', 'catedraticos' y 'posts' en arreglos de objetos JSON para cada curso
+        const coursesWithDetails = courses.map(course => ({
             ...course,
-            temas: JSON.parse(course.temas || '[]')
+            temas: JSON.parse(course.temas || '[]'),
+            catedraticos: JSON.parse(course.catedraticos || '[]'),
+            posts: JSON.parse(course.posts || '[]')
         }));
 
-        res.json(coursesWithTopics);
+        res.json(coursesWithDetails);
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error al obtener los cursos y temas');
+        res.status(500).send('Error al obtener los cursos, temas, catedráticos y posts');
     }
 }
+
+
 
 export const updateCourse = async (req, res) => {
     const { id } = req.params;

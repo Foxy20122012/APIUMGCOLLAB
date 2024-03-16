@@ -23,6 +23,36 @@ CREATE TABLE Cursos (
     semestre INT
 );
 
+//Tabla catedraticos
+
+CREATE TABLE catedraticos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(255) NOT NULL,
+  titulo VARCHAR(255),
+  email VARCHAR(255) UNIQUE
+);
+INSERT INTO catedraticos (nombre, titulo, email) VALUES
+('Aldrin Lopez', 'Profesor en fisica Matematica', 'aldrinlopez@gmail.com'),
+('Carlos cuc', 'Profesor de enseñanza media', 'carloscuc@gmail.com'),
+('Danilo Bueno', 'Profesor de enseñanza media', 'danilobuezo@gmail.com');
+
+
+//Tabla intermediaria para manejar la relación de muchos a muchos
+
+CREATE TABLE curso_catedratico (
+    curso_id INT,
+    catedratico_id INT,
+    FOREIGN KEY (curso_id) REFERENCES Cursos(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (catedratico_id) REFERENCES catedraticos(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    PRIMARY KEY (curso_id, catedratico_id)
+);
+//Agregación de campos a la tabla curso_catedratico
+ALTER TABLE curso_catedratico
+ADD nombre_curso VARCHAR(255),
+ADD nombre_catedratico VARCHAR(255);
+
+
+
 
 //Tabla de Post
 
