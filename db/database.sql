@@ -106,6 +106,16 @@ ADD COLUMN genero VARCHAR(10),
 ADD COLUMN telefono VARCHAR(20),
 ADD COLUMN direccion TEXT;
 
+//Datos de prueba
+
+INSERT INTO Estudiantes (nombre, apellido, email, fecha_nacimiento, genero, telefono, direccion) VALUES
+('Juan', 'Pérez', 'juan.perez@example.com', '1990-01-01', 'Masculino', '1234567890', 'Calle Falsa 123'),
+('María', 'López', 'maria.lopez@example.com', '1992-02-02', 'Femenino', '2345678901', 'Avenida Siempre Viva 456'),
+('Carlos', 'García', 'carlos.garcia@example.com', '1993-03-03', 'Masculino', '3456789012', 'Boulevard Los Olivos 789'),
+('Ana', 'Martínez', 'ana.martinez@example.com', '1994-04-04', 'Femenino', '4567890123', 'Plaza Central 101'),
+('Luis', 'Hernández', 'luis.hernandez@example.com', '1995-05-05', 'Masculino', '5678901234', 'Callejón del Beso 202');
+
+
 //Tabla Transcisional para manejar la relacion entre el estudiante el curso y el catedratico_id
 
 CREATE TABLE curso_estudiante (
@@ -125,6 +135,14 @@ ADD COLUMN nombre_estudiante VARCHAR(255)
 ALTER TABLE curso_estudiante
 ADD COLUMN nombre_catedratico VARCHAR(255)
 
+//Datos de prueba
+
+INSERT INTO curso_estudiante ( nombre_curso, nombre_estudiante, nombre_catedratico) VALUES
+( 'Matematicas', 'Juan', 'Aldrin Lopez'),
+( 'Matematicas', 'Maria', 'Aldrin Lopez'),
+( 'Matematicas', 'Carlos', 'Aldrin Lopez'),
+( 'Matematicas', 'Ana', 'Aldrin Lopez'),
+( 'Matematicas', 'Luis', 'Aldrin Lopez');
 
 
 CREATE TABLE links(

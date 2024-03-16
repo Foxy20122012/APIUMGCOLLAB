@@ -47,7 +47,20 @@ export const getCoursesWithTopics = async (req, res) => {
                     )
                     FROM Posts
                     WHERE Posts.curso_id = Cursos.id
-                ) AS posts
+                ) AS posts,
+                (
+                    SELECT JSON_ARRAYAGG(
+                        JSON_OBJECT(
+                            'id', Estudiantes.id,
+                            'nombre', Estudiantes.nombre,
+                            'apellido', Estudiantes.apellido,
+                            'email', Estudiantes.email
+                        )
+                    )
+                    FROM Estudiantes
+                    JOIN curso_estudiante ON Estudiantes.id = curso_estudiante.estudiante_id
+                    WHERE curso_estudiante.curso_id = Cursos.id
+                ) AS estudiantes
             FROM 
                 Cursos
             LEFT JOIN 
@@ -56,20 +69,23 @@ export const getCoursesWithTopics = async (req, res) => {
                 Cursos.id
         `);
 
-        // Convertir las cadenas de 'temas', 'catedraticos' y 'posts' en arreglos de objetos JSON para cada curso
+        // Convertir las cadenas de 'temas', 'catedraticos', 'posts' y 'estudiantes' en arreglos de objetos JSON para cada curso
         const coursesWithDetails = courses.map(course => ({
             ...course,
             temas: JSON.parse(course.temas || '[]'),
             catedraticos: JSON.parse(course.catedraticos || '[]'),
-            posts: JSON.parse(course.posts || '[]')
+            posts: JSON.parse(course.posts || '[]'),
+            estudiantes: JSON.parse(course.estudiantes || '[]')
         }));
 
         res.json(coursesWithDetails);
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error al obtener los cursos, temas, catedráticos y posts');
+        res.status(500).send('Error al obtener los cursos, temas, catedráticos, posts y estudiantes');
     }
 }
+
+
 
 
 
