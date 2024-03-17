@@ -15,6 +15,7 @@ import loginUsuarioRoute from './routes/login/loginUsuario.routes.js';//Endpoint
 //Registro de rutas Admin
 import cursosRoute from "./routes/admin/courses/cursos.routes.js"//Endpoint del administrador para administrar los cursos
 import i18nRoute from "./routes/spr/i18n/sprI18n.routes.js"//Endpoint del admin en desarrollo para administrar el i18n
+import topicsRoute from "./routes/admin/topics/topics.routes.js"
 
 const app = express();
 
@@ -29,7 +30,10 @@ app.use("/api", i18nRoute)
 
 //Routes related to courses
 app.use("/api", dataJsonRoute)
+
+//Routes admin
 app.use("/api", cursosRoute)
+app.use("/api", topicsRoute)
 
 // Routes for the main page
 app.use("/", indexRoutes);
