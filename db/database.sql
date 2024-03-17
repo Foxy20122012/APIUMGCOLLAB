@@ -82,7 +82,8 @@ CREATE TABLE Temas (
     descripcion TEXT,
     curso_id INT,
     FOREIGN KEY (curso_id) REFERENCES Cursos(id)
-);
+);ALTER TABLE Temas ADD COLUMN nombre_curso VARCHAR(255);
+
 
 
 //Datos de prueba
