@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { spController } from '../controllers/spr.controller.js';
+import { spController } from '../../controllers/spr/sprJsonRelacional.js';
 
 const router = Router();
 
 // Ejemplo de ruta que utiliza el controlador de data
-router.post('/data', spController);
+router.post('/dataJson', spController);
 
 export default router;

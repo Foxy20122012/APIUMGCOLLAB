@@ -1,7 +1,7 @@
 // authController.js
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { pool } from '../db.js';
+import { pool } from '../../db.js';
 
 export const login = async (req, res) => {
     const { correo, contraseña } = req.body;

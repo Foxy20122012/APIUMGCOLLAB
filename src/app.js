@@ -1,24 +1,26 @@
 import express from "express";
 import morgan from "morgan";
-import cors from "cors";
+import cors from "cors";//Cors encabezados http. Permite solicitar recursos restringidos en una página web desde un dominio diferente del dominio que sirvió el primer recurso
 
 
-import indexRoutes from "./routes/index.routes.js";
-import dataRoute from './routes/spr.routes.js';
-import dataJsonRoute from "./routes/sprJsonRelacional.routes.js"
+import indexRoutes from "./routes/index.routes.js";//Ruta principal de bievenida
+import dataRoute from './routes/spr/sprParams/spr.routes.js';//Ruta para consultas con Spr
+import dataJsonRoute from "./routes/spr/sprJsonRelacional.routes.js"
+import registerRoute from './routes/register/register.routes.js';//Endpoint para registrarse
+
+import linksRoute from './routes/links/links.routes.js';
 // import loginRoute from './routes/login.routes.js';
-import linksRoute from './routes/links.routes.js';
-import registerRoute from './routes/register.routes.js';
-import loginAdminRoute from './routes/loginAdmin.routes.js';
-import loginUsuarioRoute from './routes//loginUsuario.routes.js';
-import cursosRoute from "./routes/cursos.routes.js"
-import i18nRoute from "./routes/sprI18n.routes.js"
+import loginAdminRoute from './routes/login/loginAdmin.routes.js';//Endpoint para la login del administrador
+import loginUsuarioRoute from './routes/login/loginUsuario.routes.js';//Endpoint para login de los usuarios
+//Registro de rutas Admin
+import cursosRoute from "./routes/admin/courses/cursos.routes.js"//Endpoint del administrador para administrar los cursos
+import i18nRoute from "./routes/spr/i18n/sprI18n.routes.js"//Endpoint del admin en desarrollo para administrar el i18n
 
 const app = express();
 
 // Middlewares
 app.use(morgan("dev"));
-app.use(cors());
+app.use(cors());//Permite usar los encabezados para transmision de datos por medio de http por medio de los navegadores
 app.use(express.json());
 
 // Route universal routes Stored Procedured

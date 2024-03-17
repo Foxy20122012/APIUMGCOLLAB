@@ -1,4 +1,4 @@
-import { pool } from "../db.js";
+import { pool } from "../../db.js";
 import { Router } from 'express';
 
 const router = Router(); // Crea una instancia de Router
