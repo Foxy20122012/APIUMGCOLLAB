@@ -17,6 +17,9 @@ import cursosRoute from "./routes/admin/courses/cursos.routes.js"//Endpoint del 
 import i18nRoute from "./routes/spr/i18n/sprI18n.routes.js"//Endpoint del admin en desarrollo para administrar el i18n
 import topicsRoute from "./routes/admin/topics/topics.routes.js"
 
+//Post student
+import postStudentRoute from "./routes/students/postStudent/postStudent.routes.js"
+
 const app = express();
 
 // Middlewares
@@ -44,6 +47,9 @@ app.use('/api', linksRoute);
 app.use('/api', registerRoute );
 app.use("/api", loginAdminRoute)
 app.use("/api", loginUsuarioRoute);
+
+//Route Student
+app.use("/api", postStudentRoute );//Route Post Student
 
 
 app.use((req, res, next) => {
