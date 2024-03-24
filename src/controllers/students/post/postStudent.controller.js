@@ -42,6 +42,8 @@ export const getPostsByUser = async (req, res) => {
             return res.status(401).json({ message: "Invalid token" });
         }
         console.error(error);
+        console.error('Error details:', error);
+   
         res.status(500).json({ message: "Something went wrong" });
     }
 };
