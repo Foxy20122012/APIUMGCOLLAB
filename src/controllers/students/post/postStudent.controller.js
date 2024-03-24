@@ -15,6 +15,11 @@ export const getPostsByUser = async (req, res) => {
         // Verificar el token
         const decoded = jwt.verify(token, secretKey);
 
+        // Verificar que el token ha sido decodificado correctamente
+        if (!decoded || !decoded.id) {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+
         // Asumiendo que el token decodificado contiene el id del usuario
         const userId = decoded.id;
 
@@ -42,8 +47,6 @@ export const getPostsByUser = async (req, res) => {
             return res.status(401).json({ message: "Invalid token" });
         }
         console.error(error);
-        console.error('Error details:', error);
-   
         res.status(500).json({ message: "Something went wrong" });
     }
 };
