@@ -100,3 +100,40 @@ export const createPost = async (req, res) => {
         res.status(500).json({ message: "Something went wrong" });
     }
 };
+
+
+export const updatePost = async (req, res) => {
+    try {
+        const { id } = req.params; // Obtener el ID del post desde los parámetros de la ruta
+        const { titulo, contenido, nombre } = req.body; // Obtener los datos actualizados del cuerpo de la solicitud
+
+        // Aquí podrías verificar si el post pertenece al usuario con el ID 'userId' antes de permitir la actualización.
+        // Si no pertenece, podrías retornar un error 403 (Forbidden).
+
+        // Actualizar el post en la base de datos
+        const [result] = await pool.query(`
+            UPDATE Posts 
+            SET titulo = ?, contenido = ?, nombre = ?
+            WHERE id = ? 
+        `, [titulo, contenido, nombre, id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Post not found or no changes made" });
+        }
+
+        // Devolver una respuesta confirmando la actualización
+        res.json({
+            message: "Post updated successfully",
+            postId: id,
+            titulo,
+            contenido,
+            nombre
+        });
+    } catch (error) {
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+        console.error('Error:', error);
+        res.status(500).json({ message: "Something went wrong" });
+    }
+};
