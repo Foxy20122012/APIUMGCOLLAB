@@ -137,3 +137,39 @@ export const updatePost = async (req, res) => {
         res.status(500).json({ message: "Something went wrong" });
     }
 };
+
+
+export const deletePost = async (req, res) => {
+    try {
+        const { id } = req.params; // ID del post a eliminar
+        const token = req.headers.authorization?.split(' ')[1];
+
+        if (!token) {
+            return res.status(401).json({ message: "No token provided" });
+        }
+
+        const decoded = jwt.verify(token, secretKey);
+        const userId = decoded.id;
+
+        // Aquí puedes añadir una verificación para asegurarte de que el usuario tiene permisos para eliminar el post
+        // Por ejemplo, verificar si el post pertenece al usuario o si el usuario tiene un rol específico
+
+        const [result] = await pool.query(`
+            DELETE FROM Posts WHERE id = ? AND usuario_id = ?
+        `, [id, userId]);
+
+        if (result.affectedRows === 0) {
+            // Si no se encontró el post o no pertenece al usuario, devolver un error
+            return res.status(404).json({ message: "Post not found or not owned by user" });
+        }
+
+        res.json({ message: "Post deleted successfully" });
+    } catch (error) {
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+        // Otros manejos de error aquí...
+        console.error('Error:', error);
+        res.status(500).json({ message: "Something went wrong" });
+    }
+};
