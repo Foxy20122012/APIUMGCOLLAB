@@ -51,3 +51,52 @@ export const getPostsByUser = async (req, res) => {
         res.status(500).json({ message: "Something went wrong" });
     }
 };
+
+export const createPost = async (req, res) => {
+    try {
+        // Obtener el token del header de autorización
+        const token = req.headers.authorization?.split(' ')[1];
+
+        if (!token) {
+            return res.status(401).json({ message: "No token provided" });
+        }
+
+        // Verificar el token
+        const decoded = jwt.verify(token, secretKey);
+
+        // Verificar que el token ha sido decodificado correctamente
+        if (!decoded || !decoded.id) {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+
+        // Asumiendo que el token decodificado contiene el id del usuario
+        const userId = decoded.id;
+
+        // Obtener los datos del post desde el cuerpo de la solicitud
+        const { titulo, contenido, estado, visible, curso_id, nombre } = req.body;
+
+        // Insertar el nuevo post en la base de datos
+        const [result] = await pool.query(`
+            INSERT INTO Posts (titulo, contenido, estado, visible, usuario_id, curso_id, nombre)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `, [titulo, contenido, estado, visible, userId, curso_id, nombre]);
+
+        // Devolver una respuesta con el post creado
+        res.status(201).json({
+            id: result.insertId,
+            titulo,
+            contenido,
+            estado,
+            visible,
+            usuario_id: userId,
+            curso_id,
+            nombre
+        });
+    } catch (error) {
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+        console.error(error);
+        res.status(500).json({ message: "Something went wrong" });
+    }
+};
