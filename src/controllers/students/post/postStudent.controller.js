@@ -52,51 +52,51 @@ export const getPostsByUser = async (req, res) => {
     }
 };
 
+
+
 export const createPost = async (req, res) => {
     try {
         // Obtener el token del header de autorización
-        const token = req.headers.authorization?.split(' ')[1];
-
-        if (!token) {
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
             return res.status(401).json({ message: "No token provided" });
         }
 
-        // Verificar el token
-        const decoded = jwt.verify(token, secretKey);
-
-        // Verificar que el token ha sido decodificado correctamente
-        if (!decoded || !decoded.id) {
-            return res.status(401).json({ message: "Invalid token" });
+        const token = authHeader.split(' ')[1]; // Extraer el token de la cabecera
+        if (!token) {
+            return res.status(401).json({ message: "Token is not complete" });
         }
 
-        // Asumiendo que el token decodificado contiene el id del usuario
+        // Verificar y decodificar el token
+        const decoded = jwt.verify(token, secretKey);
         const userId = decoded.id;
 
-        // Obtener los datos del post desde el cuerpo de la solicitud
-        const { titulo, contenido, estado, visible, curso_id, nombre } = req.body;
+        // Extraer los datos del post desde el cuerpo de la solicitud
+        const { titulo, contenido, nombre } = req.body;
 
         // Insertar el nuevo post en la base de datos
         const [result] = await pool.query(`
-            INSERT INTO Posts (titulo, contenido, estado, visible, usuario_id, curso_id, nombre)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        `, [titulo, contenido, estado, visible, userId, curso_id, nombre]);
+            INSERT INTO Posts (titulo, contenido, usuario_id, nombre)
+            VALUES (?, ?, ?, ?)
+        `, [titulo, contenido, userId, nombre]); // No es necesario incluir 'estado' ni 'visible' porque la BD les asigna valores por defecto
 
         // Devolver una respuesta con el post creado
         res.status(201).json({
             id: result.insertId,
             titulo,
             contenido,
-            estado,
-            visible,
+            estado: 'pendiente', // Valor por defecto según la estructura de la tabla
+            visible: 1, // Valor por defecto según la estructura de la tabla
             usuario_id: userId,
-            curso_id,
             nombre
         });
     } catch (error) {
         if (error.name === 'JsonWebTokenError') {
             return res.status(401).json({ message: "Invalid token" });
+        } else if (error.name === 'TokenExpiredError') {
+            return res.status(401).json({ message: "Token has expired" });
         }
-        console.error(error);
+        console.error('Error:', error);
         res.status(500).json({ message: "Something went wrong" });
     }
 };
