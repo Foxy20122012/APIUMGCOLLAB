@@ -12,3 +12,10 @@
     "contraseña": "Admin123",
     "rol": "admin"
 }
+
+{   
+    "nombre": "Enrique",
+    "correo": "juan@miumg.edu.gt",
+    "contraseña": "juan1234" ,
+    "rol": "administrador"
+}

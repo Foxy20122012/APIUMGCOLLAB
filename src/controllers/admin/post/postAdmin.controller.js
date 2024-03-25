@@ -53,6 +53,7 @@ export const getPostsByUser = async (req, res) => {
 };
 
 
+
 export const createPost = async (req, res) => {
     try {
         // Obtener el token del header de autorización
@@ -69,33 +70,22 @@ export const createPost = async (req, res) => {
         // Verificar y decodificar el token
         const decoded = jwt.verify(token, secretKey);
         const userId = decoded.id;
-        const userRole = decoded.rol;
 
         // Extraer los datos del post desde el cuerpo de la solicitud
         const { titulo, contenido, nombre } = req.body;
 
-        // Definir el estado inicial del post
-        let estado = null;
-
-        // Verificar si el rol del usuario es "superadmin" o "administrador" para cambiar el estado a "aprobado"
-        if (userRole == 'superadmin' || userRole == 'administrador') {
-            estado = 'aprobado';
-        } else {
-            estado = 'pendiente';
-        }
-
         // Insertar el nuevo post en la base de datos
         const [result] = await pool.query(`
-            INSERT INTO Posts (titulo, contenido, usuario_id, nombre, estado)
-            VALUES (?, ?, ?, ?, ?)
-        `, [titulo, contenido, userId, nombre, estado]); // No es necesario incluir 'visible' porque la BD les asigna valores por defecto
+            INSERT INTO Posts (titulo, contenido, usuario_id, nombre)
+            VALUES (?, ?, ?, ?)
+        `, [titulo, contenido, userId, nombre]); // No es necesario incluir 'estado' ni 'visible' porque la BD les asigna valores por defecto
 
         // Devolver una respuesta con el post creado
         res.status(201).json({
             id: result.insertId,
             titulo,
             contenido,
-            estado,
+            estado: 'pendiente', // Valor por defecto según la estructura de la tabla
             visible: 1, // Valor por defecto según la estructura de la tabla
             usuario_id: userId,
             nombre
@@ -110,8 +100,6 @@ export const createPost = async (req, res) => {
         res.status(500).json({ message: "Something went wrong" });
     }
 };
-
-
 
 
 export const updatePost = async (req, res) => {
