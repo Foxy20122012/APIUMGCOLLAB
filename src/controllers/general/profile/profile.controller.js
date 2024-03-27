@@ -1,0 +1,73 @@
+
+import { pool } from '../../../db.js';
+import jwt from 'jsonwebtoken';
+import {JWT_SECRET} from "../../../config.js"
+
+const secretKey = JWT_SECRET; // Debes definir una clave secreta para la verificación del token
+
+
+
+export const getProfileUser = async (req, res) => {
+    try {
+        // Obtener el token del header de autorización
+        const token = req.headers.authorization?.split(' ')[1];
+
+        if (!token) {
+            return res.status(401).json({ message: "No token provided" });
+        }
+
+        // Verificar el token
+        const decoded = jwt.verify(token, secretKey);
+
+        // Verificar que el token ha sido decodificado correctamente
+        if (!decoded || !decoded.id) {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+
+        // Asumiendo que el token decodificado contiene el id del usuario
+        const userId = decoded.id;
+
+        // Obtener los datos del usuario
+        const [userData] = await pool.query(`
+            SELECT 
+                id,
+                nombre,
+                correo,
+                imagen_perfil,
+                telefono,
+                apellido,
+                rol
+            FROM 
+                Usuarios
+            WHERE 
+                id = ?
+        `, [userId]);
+
+        // Obtener los posts del usuario
+        const [Posts] = await pool.query(`
+            SELECT 
+                id,
+                titulo,
+                contenido,
+                estado,
+                visible,
+                fecha_creacion,
+                fecha_actualizacion,
+                usuario_id,
+                curso_id,
+                nombre
+            FROM 
+                Posts
+            WHERE 
+                usuario_id = ?
+        `, [userId]);
+
+        res.json({ userData, Posts });
+    } catch (error) {
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+        console.error(error);
+        res.status(500).json({ message: "Something went wrong" });
+    }
+};

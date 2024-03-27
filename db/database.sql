@@ -4,11 +4,18 @@ CREATE TABLE Usuarios (
     nombre VARCHAR(255) NOT NULL,
     correo VARCHAR(255) NOT NULL UNIQUE,
     contraseña VARCHAR(255) NOT NULL,
-    rol ENUM('superadmin, administrador', 'usuario') NOT NULL
+    rol ENUM('superadmin', 'administrador', 'usuario') NOT NULL
 );
 //Agregar dos campos mas a la tabla de usuarios
 fecha_nacimiento DATE,
     activado BOOLEAN DEFAULT FALSE,
+
+//Agregando campos para imagen, telefono y apellido de Usuarios.
+ALTER TABLE Usuarios
+ADD COLUMN imagen_perfil BLOB AFTER contraseña,
+ADD COLUMN telefono VARCHAR(20) AFTER imagen_perfil,
+ADD COLUMN apellido VARCHAR(255) AFTER telefono;
+
 
 
 

@@ -1,7 +1,9 @@
 import { pool } from '../../../db.js';
 import jwt from 'jsonwebtoken';
+import {JWT_SECRET} from "../../../config.js"
 
-const secretKey = "4a5b9f8c67eafcd2d3b1e5270a84e6f1"; // Debes definir una clave secreta para la verificación del token
+
+const secretKey = JWT_SECRET; // Debes definir una clave secreta para la verificación del token
 
 export const getPostsByUser = async (req, res) => {
     try {
