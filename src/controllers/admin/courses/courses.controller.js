@@ -245,3 +245,72 @@ export const getCoursesWithTopicsExcel = async (req, res) => {
         res.status(500).send('Error al generar el reporte en Excel');
     }
 };
+
+//Controlador para generar excel por id
+
+
+export const getCourseByIdExcel = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const [course] = await pool.query(`
+            SELECT 
+                id,
+                codigo AS Codigo,
+                nombre,
+                descripcion,
+                semestre,
+                creditos
+            FROM 
+                Cursos
+            WHERE
+                id = ?
+        `, [id]);
+
+        if (!course || course.length === 0) {
+            return res.status(404).send('Curso no encontrado');
+        }
+
+        // Crear un nuevo workbook de Excel
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet('Curso');
+
+        // Obtener el modelo de columnas
+        const columnsModel = coursesModel();
+
+        // Agregar encabezados de columna
+        sheet.columns = columnsModel;
+
+        // Agregar datos al archivo de Excel
+        sheet.addRow({
+            id: course[0].id,
+            Codigo: course[0].Codigo,
+            nombre: course[0].nombre,
+            descripcion: course[0].descripcion,
+            semestre: course[0].semestre,
+            creditos: course[0].creditos,
+        });
+
+        // Establecer estilos para el encabezado
+        sheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
+            row.font = { bold: true, color: { argb: 'FFFFFF' } };
+            row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '2A3F54' } };
+            row.alignment = { vertical: 'middle', horizontal: 'center' };
+        });
+
+        // Establecer estilos para la tabla de datos
+        sheet.eachRow({ includeEmpty: false, from: 2 }, function (row, rowNumber) {
+            row.alignment = { vertical: 'middle', horizontal: 'left' };
+        });
+
+        // Guardar el workbook en un archivo
+        const fileName = `curso_${id}.xlsx`;
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+        await workbook.xlsx.write(res);
+        res.end();
+    } catch (error) {
+        console.error('Error al generar el reporte en Excel:', error);
+        res.status(500).send('Error al generar el reporte en Excel');
+    }
+};

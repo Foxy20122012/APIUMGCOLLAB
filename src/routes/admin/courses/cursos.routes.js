@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getCoursesWithTopics,getCoursesWithTopicsExcel,  getCourseById, updateCourse, deleteCourse } from '../../../controllers/admin/courses/courses.controller.js';
+import { getCoursesWithTopics,getCoursesWithTopicsExcel, getCourseByIdExcel,  getCourseById, updateCourse, deleteCourse } from '../../../controllers/admin/courses/courses.controller.js';
 
 const router = Router();
 
@@ -18,5 +18,9 @@ router.delete('/cursos/:id', deleteCourse);
 
 // Ruta para generar un archivo de Excel con los cursos y temas
 router.get('/cursosExcel', getCoursesWithTopicsExcel);
+
+//Ruta para generar Excel por ID
+
+router.get('/cursos/:id/excel', getCourseByIdExcel);
 
 export default router;
