@@ -5,8 +5,6 @@ import jwt from 'jsonwebtoken';
 
 const secretKey = "4a5b9f8c67eafcd2d3b1e5270a84e6f1"; // Debes definir una clave secreta para la verificación del token
 
-
-
 export const getProfileUser = async (req, res) => {
     try {
         // Obtener el token del header de autorización
@@ -43,26 +41,7 @@ export const getProfileUser = async (req, res) => {
                 id = ?
         `, [userId]);
 
-        // Obtener los posts del usuario
-        const [Posts] = await pool.query(`
-            SELECT 
-                id,
-                titulo,
-                contenido,
-                estado,
-                visible,
-                fecha_creacion,
-                fecha_actualizacion,
-                usuario_id,
-                curso_id,
-                nombre
-            FROM 
-                Posts
-            WHERE 
-                usuario_id = ?
-        `, [userId]);
-
-        res.json({ userData, Posts });
+        res.json(userData);
     } catch (error) {
         if (error.name === 'JsonWebTokenError') {
             return res.status(401).json({ message: "Invalid token" });

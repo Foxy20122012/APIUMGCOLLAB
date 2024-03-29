@@ -1,5 +1,6 @@
 import { pool } from '../../../db.js';
-
+import ExcelJS from 'exceljs';
+import coursesModel from '../../../models/coursesModel.js';
 
 export const getCoursesWithTopics = async (req, res) => {
     try {
@@ -182,3 +183,65 @@ export const getCourseById = async (req, res) => {
     }
 };
 
+
+//Controlador para convertir excel
+
+
+export const getCoursesWithTopicsExcel = async (req, res) => {
+    try {
+        const [courses] = await pool.query(`
+            SELECT 
+                id,
+                codigo AS Codigo,
+                nombre,
+                descripcion,
+                semestre,
+                creditos
+            FROM 
+                Cursos
+        `);
+
+        // Crear un nuevo workbook de Excel
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet('Cursos');
+
+        // Obtener el modelo de columnas
+        const columnsModel = coursesModel();
+
+        // Agregar encabezados de columna
+        sheet.columns = columnsModel;
+
+        // Agregar datos al archivo de Excel
+        courses.forEach(course => {
+            sheet.addRow({
+                id: course.id,
+                Codigo: course.Codigo,
+                nombre: course.nombre,
+                descripcion: course.descripcion,
+                semestre: course.semestre,
+                creditos: course.creditos,
+            });
+        });
+
+        // Establecer estilos para el encabezado
+        sheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
+            row.font = { bold: true };
+            row.alignment = { vertical: 'middle', horizontal: 'center' };
+        });
+
+        // Establecer estilos para la tabla de datos
+        sheet.eachRow({ includeEmpty: false, from: 2 }, function (row, rowNumber) {
+            row.alignment = { vertical: 'middle', horizontal: 'left' };
+        });
+
+        // Guardar el workbook en un archivo
+        const fileName = 'cursos.xlsx';
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+        await workbook.xlsx.write(res);
+        res.end();
+    } catch (error) {
+        console.error('Error al generar el reporte en Excel:', error);
+        res.status(500).send('Error al generar el reporte en Excel');
+    }
+};
