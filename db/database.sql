@@ -15,6 +15,10 @@ ALTER TABLE Usuarios
 ADD COLUMN imagen_perfil BLOB AFTER contraseña,
 ADD COLUMN telefono VARCHAR(20) AFTER imagen_perfil,
 ADD COLUMN apellido VARCHAR(255) AFTER telefono;
+ALTER TABLE usuarios
+ADD COLUMN puesto VARCHAR(255),
+ADD COLUMN id_posicion INT;
+
 
 
 
@@ -38,6 +42,9 @@ CREATE TABLE catedraticos (
   titulo VARCHAR(255),
   email VARCHAR(255) UNIQUE
 );
+ALTER TABLE catedraticos
+ADD COLUMN contraseña VARCHAR(255)
+
 INSERT INTO catedraticos (nombre, titulo, email) VALUES
 ('Aldrin Lopez', 'Profesor en fisica Matematica', 'aldrinlopez@gmail.com'),
 ('Carlos cuc', 'Profesor de enseñanza media', 'carloscuc@gmail.com'),
@@ -113,6 +120,8 @@ ADD COLUMN fecha_nacimiento DATE,
 ADD COLUMN genero VARCHAR(10),
 ADD COLUMN telefono VARCHAR(20),
 ADD COLUMN direccion TEXT;
+ALTER TABLE Estudiantes
+ADD COLUMN contraseña VARCHAR(255)
 
 //Datos de prueba
 
@@ -165,4 +174,9 @@ CREATE TABLE links(
 
 
 ALTER TABLE links ADD PRIMARY KEY(id);
+
+
+
+
+
 

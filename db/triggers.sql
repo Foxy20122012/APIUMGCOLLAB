@@ -102,4 +102,94 @@ END$$
 DELIMITER ;
 
 
+//Trigger encargado de capturar la insercion de un Catedratico y capturar las credenciales necesarias para la tabla usuarios.
+
+DELIMITER //
+CREATE OR REPLACE TRIGGER after_insert_catedratico
+AFTER INSERT ON catedraticos
+FOR EACH ROW
+BEGIN
+    INSERT INTO usuarios (nombre, correo, contraseña, puesto, id_posicion, rol)
+    VALUES (NEW.nombre, NEW.email, NEW.contraseña, 'catedraticos', NEW.id, 'administrador');
+END;
 //
+DELIMITER ;
+
+
+//Trigger en la tabla usuarios para actualizar la tabla catedraticos: //Para cuando se actualice un usuario
+
+DELIMITER //
+CREATE TRIGGER after_update_usuarios
+AFTER UPDATE ON Usuarios
+FOR EACH ROW
+BEGIN
+    IF NEW.puesto = 'catedraticos' THEN
+        UPDATE catedraticos
+        SET nombre = NEW.nombre, email = NEW.correo, contraseña = NEW.contraseña
+        WHERE id = NEW.id_posicion;
+    END IF;
+END;
+//
+DELIMITER ;
+
+//Trigger en la tabla catedraticos para actualizar la tabla usuarios: //Para cuando se actualicen los datos de la tabla catedraticos
+
+DELIMITER //
+CREATE TRIGGER after_update_catedraticos
+AFTER UPDATE ON catedraticos
+FOR EACH ROW
+BEGIN
+    UPDATE usuarios
+    SET nombre = NEW.nombre, correo = NEW.email, contraseña = NEW.contraseña
+    WHERE id_posicion = NEW.id AND puesto = 'catedraticos';
+END;
+//
+DELIMITER ;
+
+
+
+//Este trigger se activará después de cada inserción en la tabla de estudiantes. Insertará automáticamente los datos de nombre, correo, contraseña y el ID del estudiante en la tabla de usuarios
+
+DELIMITER //
+CREATE TRIGGER after_insert_estudiante
+AFTER INSERT ON Estudiantes
+FOR EACH ROW
+BEGIN
+    INSERT INTO Usuarios (nombre, correo, contraseña, puesto, id_posicion, rol)
+    VALUES (NEW.nombre, NEW.email, NEW.contraseña, 'Estudiantes', NEW.id, 'usuario');
+END;
+//
+DELIMITER ;
+
+
+
+//Trigger en la tabla Usuarios para actualizar la tabla Estudiantes:
+
+DELIMITER //
+CREATE OR REPLACE TRIGGER after_update_usuarios
+AFTER UPDATE ON Usuarios
+FOR EACH ROW
+BEGIN
+    IF NEW.puesto = 'Estudiantes' THEN
+        UPDATE Estudiantes
+        SET nombre = NEW.nombre, email = NEW.correo, contraseña = NEW.contraseña
+        WHERE id = NEW.id_posicion;
+    END IF;
+END;
+//
+DELIMITER ;
+
+
+// Trigger en la tabla Estudiantes para actualizar la tabla Usuarios:
+
+DELIMITER //
+CREATE OR REPLACE TRIGGER after_update_estudiantes
+AFTER UPDATE ON Estudiantes
+FOR EACH ROW
+BEGIN
+    UPDATE Usuarios
+    SET nombre = NEW.nombre, correo = NEW.email, contraseña = NEW.contraseña
+    WHERE id_posicion = NEW.id AND puesto = 'Estudiantes';
+END;
+//
+DELIMITER ;

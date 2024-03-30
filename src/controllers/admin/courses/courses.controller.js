@@ -86,7 +86,26 @@ export const getCoursesWithTopics = async (req, res) => {
     }
 }
 
+//Controlador para crear cursos
+export const createCourse = async (req, res) => {
+    const { nombre, descripcion } = req.body;
 
+    try {
+        const [result] = await pool.query(`
+            INSERT INTO Cursos (nombre, descripcion)
+            VALUES (?, ?)
+        `, [nombre, descripcion]);
+
+        if (result.affectedRows === 0) {
+            return res.status(500).send('Error al insertar el curso');
+        }
+
+        res.send('Curso creado con éxito');
+    } catch (error) {
+        console.error('Error al insertar el curso:', error);
+        res.status(500).send('Error al insertar el curso');
+    }
+};
 
 
 

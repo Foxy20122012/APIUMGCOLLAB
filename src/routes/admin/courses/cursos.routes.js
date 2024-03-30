@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getCoursesWithTopics,getCoursesWithTopicsExcel, getCourseByIdExcel,  getCourseById, updateCourse, deleteCourse } from '../../../controllers/admin/courses/courses.controller.js';
+import { getCoursesWithTopics, createCourse, getCoursesWithTopicsExcel, getCourseByIdExcel,  getCourseById, updateCourse, deleteCourse } from '../../../controllers/admin/courses/courses.controller.js';
 
 const router = Router();
 
@@ -22,5 +22,7 @@ router.get('/cursosExcel', getCoursesWithTopicsExcel);
 //Ruta para generar Excel por ID
 
 router.get('/cursos/:id/excel', getCourseByIdExcel);
+
+router.post('/cursos', createCourse);
 
 export default router;
