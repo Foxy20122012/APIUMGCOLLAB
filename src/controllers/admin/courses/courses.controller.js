@@ -108,23 +108,20 @@ export const createCourse = async (req, res) => {
 };
 
 
-
 export const updateCourse = async (req, res) => {
     const { id } = req.params;
-    const {  nombre, descripcion } = req.body;
+    const { nombre, descripcion } = req.body;
 
     try {
         const [result] = await pool.query(`
             UPDATE Cursos
             SET 
-                
                 nombre = ?,
-                descripcion = ?,
-                
+                descripcion = ?
             WHERE id = ?
-        `, [ nombre, descripcion, id]);
+        `, [nombre, descripcion, id]);
 
-        if (result.affectedRows === 0) {
+        if (result.changedRows === 0) {
             return res.status(404).send('Curso no encontrado');
         }
 
@@ -133,7 +130,7 @@ export const updateCourse = async (req, res) => {
         console.error(error);
         res.status(500).send('Error al actualizar el curso');
     }
-}
+};
 
 
 export const deleteCourse = async (req, res) => {
