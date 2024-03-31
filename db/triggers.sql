@@ -1,3 +1,16 @@
+//Trigger para crear un Identificador Unico universal para generar el codigo de la tabla cursos
+
+DELIMITER //
+CREATE TRIGGER before_insert_curso
+BEFORE INSERT ON Cursos
+FOR EACH ROW
+BEGIN
+    SET NEW.codigo = UUID();
+END;
+//
+DELIMITER ;
+
+
 //  trigger que se ejecute antes de insertar en curso_catedratico y que
  busque los IDs correspondientes a partir de los nombres proporcionados
 

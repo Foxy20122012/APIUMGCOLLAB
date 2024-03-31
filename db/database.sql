@@ -34,6 +34,11 @@ CREATE TABLE Cursos (
     semestre INT
 );
 
+ALTER TABLE Cursos
+CHANGE COLUMN semestre año INT(11) NOT NULL AFTER descripcion,
+DROP COLUMN requisitos;
+
+
 //Tabla catedraticos
 
 CREATE TABLE catedraticos (

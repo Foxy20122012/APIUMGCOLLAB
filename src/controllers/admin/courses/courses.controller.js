@@ -10,7 +10,7 @@ export const getCoursesWithTopics = async (req, res) => {
                 Cursos.codigo,
                 Cursos.nombre,
                 Cursos.descripcion,
-                Cursos.semestre,
+                Cursos.año,
                 Cursos.creditos,
                 JSON_ARRAYAGG(
                     JSON_OBJECT(
@@ -111,19 +111,18 @@ export const createCourse = async (req, res) => {
 
 export const updateCourse = async (req, res) => {
     const { id } = req.params;
-    const { codigo, nombre, descripcion, semestre, creditos } = req.body;
+    const {  nombre, descripcion } = req.body;
 
     try {
         const [result] = await pool.query(`
             UPDATE Cursos
             SET 
-                codigo = ?,
+                
                 nombre = ?,
                 descripcion = ?,
-                semestre = ?,
-                creditos = ?
+                
             WHERE id = ?
-        `, [codigo, nombre, descripcion, semestre, creditos, id]);
+        `, [ nombre, descripcion, id]);
 
         if (result.affectedRows === 0) {
             return res.status(404).send('Curso no encontrado');
@@ -167,7 +166,7 @@ export const getCourseById = async (req, res) => {
                 Cursos.codigo AS codigo,
                 Cursos.nombre AS Curso,
                 Cursos.descripcion AS DescripcionCurso,
-                Cursos.semestre AS Semestre,
+                Cursos.año AS año,
                 Cursos.creditos AS Creditos,
                 JSON_ARRAYAGG(
                     JSON_OBJECT(
@@ -214,7 +213,7 @@ export const getCoursesWithTopicsExcel = async (req, res) => {
                 codigo AS Codigo,
                 nombre,
                 descripcion,
-                semestre,
+                año,
                 creditos
             FROM 
                 Cursos
@@ -237,7 +236,7 @@ export const getCoursesWithTopicsExcel = async (req, res) => {
                 Codigo: course.Codigo,
                 nombre: course.nombre,
                 descripcion: course.descripcion,
-                semestre: course.semestre,
+                semestre: course.año,
                 creditos: course.creditos,
             });
         });
@@ -278,7 +277,7 @@ export const getCourseByIdExcel = async (req, res) => {
                 codigo AS Codigo,
                 nombre,
                 descripcion,
-                semestre,
+                año,
                 creditos
             FROM 
                 Cursos
@@ -306,7 +305,7 @@ export const getCourseByIdExcel = async (req, res) => {
             Codigo: course[0].Codigo,
             nombre: course[0].nombre,
             descripcion: course[0].descripcion,
-            semestre: course[0].semestre,
+            año: course[0].año,
             creditos: course[0].creditos,
         });
 
