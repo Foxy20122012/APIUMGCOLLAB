@@ -1,5 +1,6 @@
 import { pool } from '../../../db.js';
 import ExcelJS from 'exceljs';
+import PDFDocument from 'pdfkit';
 import coursesModel from '../../../models/coursesModel.js';
 
 export const getCoursesWithTopics = async (req, res) => {
@@ -327,5 +328,102 @@ export const getCourseByIdExcel = async (req, res) => {
     } catch (error) {
         console.error('Error al generar el reporte en Excel:', error);
         res.status(500).send('Error al generar el reporte en Excel');
+    }
+};
+
+
+//Controlador para generar PDF con todos los cursos
+
+
+export const getCoursesWithTopicsPDF = async (req, res) => {
+    try {
+        const [courses] = await pool.query(`
+            SELECT 
+                id,
+                codigo,
+                nombre,
+                descripcion,
+                año,
+            FROM 
+                Cursos
+        `);
+
+        const doc = new PDFDocument();
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename="cursos.pdf"');
+        doc.pipe(res);
+        doc.fontSize(20).text('Listado de Cursos', { align: 'center' });
+        doc.moveDown();
+        courses.forEach(course => {
+            doc.fontSize(16).text(`Curso: ${course.nombre}`, { continued: true }).text(`Código: ${course.codigo}`);
+            doc.fontSize(12).text(`Descripción: ${course.descripcion}`);
+            doc.fontSize(12).text(`Año: ${course.año}`);
+            doc.moveDown();
+        });
+
+        doc.end();
+    } catch (error) {
+        console.error('Error al generar el reporte en PDF:', error);
+        res.status(500).send('Error al generar el reporte en PDF');
+    }
+};
+
+
+//Controlador para PDF por Id del Curso
+
+export const getCourseByIdPDF = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const [course] = await pool.query(`
+            SELECT 
+                Cursos.id,
+                Cursos.codigo AS Codigo,
+                Cursos.nombre AS NombreCurso,
+                Cursos.descripcion AS DescripcionCurso,
+                Cursos.año AS Año,
+                Temas.id AS IdTema,
+                Temas.nombre AS NombreTema,
+                Temas.descripcion AS DescripcionTema
+            FROM 
+                Cursos
+            LEFT JOIN 
+                Temas ON Cursos.id = Temas.curso_id
+            WHERE
+                Cursos.id = ?
+        `, [id]);
+
+        if (!course || course.length === 0) {
+            return res.status(404).send('Curso no encontrado');
+        }
+
+        const doc = new PDFDocument();
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="curso_${id}.pdf"`);
+        doc.pipe(res);
+
+        // Estilo para el título
+        doc.fontSize(20).font('Helvetica-Bold').text(`Curso: ${course[0].NombreCurso}`, { align: 'center' });
+        doc.moveDown();
+
+        // Información del curso
+        doc.fontSize(12).font('Helvetica').text(`Código: ${course[0].Codigo}`);
+        doc.fontSize(12).text(`Descripción: ${course[0].DescripcionCurso}`);
+        doc.fontSize(12).text(`Año: ${course[0].Año}`);
+        doc.moveDown();
+
+        // Temas relacionados
+        doc.fontSize(16).font('Helvetica-Bold').text('Temas Relacionados:', { underline: true });
+        doc.moveDown();
+        course.forEach(row => {
+            if (row.IdTema && row.NombreTema && row.DescripcionTema) {
+                doc.fontSize(12).font('Helvetica').text(`- ${row.NombreTema}: ${row.DescripcionTema}`);
+            }
+        });
+
+        doc.end();
+    } catch (error) {
+        console.error('Error al generar el reporte en PDF:', error);
+        res.status(500).send('Error al generar el reporte en PDF');
     }
 };

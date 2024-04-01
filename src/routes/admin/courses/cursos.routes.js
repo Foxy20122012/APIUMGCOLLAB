@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getCoursesWithTopics, createCourse, getCoursesWithTopicsExcel, getCourseByIdExcel,  getCourseById, updateCourse, deleteCourse } from '../../../controllers/admin/courses/courses.controller.js';
+import { getCoursesWithTopics, createCourse, getCoursesWithTopicsExcel, getCourseByIdExcel,  getCourseById, updateCourse, deleteCourse, getCoursesWithTopicsPDF, getCourseByIdPDF } from '../../../controllers/admin/courses/courses.controller.js';
 
 const router = Router();
 
@@ -12,7 +12,6 @@ router.get('/cursos/:id', getCourseById);
 // Actualizar un curso específico por su ID
 router.put('/cursos/:id', updateCourse);
 
-
 // Eliminar un curso específico por su ID
 router.delete('/cursos/:id', deleteCourse);
 
@@ -23,6 +22,14 @@ router.get('/cursosExcel', getCoursesWithTopicsExcel);
 
 router.get('/cursos/:id/excel', getCourseByIdExcel);
 
+//Ruta para crear Post
+
 router.post('/cursos', createCourse);
+
+// Ruta para obtener todos los cursos con temas en formato PDF
+router.get('/cursosPdf', getCoursesWithTopicsPDF);
+
+// Ruta para obtener un curso por su ID en formato PDF
+router.get('/cursos/:id/pdf', getCourseByIdPDF);
 
 export default router;
