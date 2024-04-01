@@ -343,7 +343,7 @@ export const getCoursesWithTopicsPDF = async (req, res) => {
                 codigo,
                 nombre,
                 descripcion,
-                año,
+                año
             FROM 
                 Cursos
         `);
@@ -367,6 +367,7 @@ export const getCoursesWithTopicsPDF = async (req, res) => {
         res.status(500).send('Error al generar el reporte en PDF');
     }
 };
+
 
 
 //Controlador para PDF por Id del Curso
