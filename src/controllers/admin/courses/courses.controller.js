@@ -12,7 +12,6 @@ export const getCoursesWithTopics = async (req, res) => {
                 Cursos.nombre,
                 Cursos.descripcion,
                 Cursos.año,
-                Cursos.creditos,
                 JSON_ARRAYAGG(
                     JSON_OBJECT(
                         'id', Temas.id,
@@ -74,10 +73,10 @@ export const getCoursesWithTopics = async (req, res) => {
         // Convertir las cadenas de 'temas', 'catedraticos', 'posts' y 'estudiantes' en arreglos de objetos JSON para cada curso
         const coursesWithDetails = courses.map(course => ({
             ...course,
-            temas: JSON.parse(course.temas || '[]'),
-            catedraticos: JSON.parse(course.catedraticos || '[]'),
-            posts: JSON.parse(course.posts || '[]'),
-            estudiantes: JSON.parse(course.estudiantes || '[]')
+            temas: typeof course.temas === 'string' ? JSON.parse(course.temas || '[]') : course.temas,
+            catedraticos: typeof course.catedraticos === 'string' ? JSON.parse(course.catedraticos || '[]') : course.catedraticos,
+            posts: typeof course.posts === 'string' ? JSON.parse(course.posts || '[]') : course.posts,
+            estudiantes: typeof course.estudiantes === 'string' ? JSON.parse(course.estudiantes || '[]') : course.estudiantes,
         }));
 
         res.json(coursesWithDetails);
@@ -86,6 +85,7 @@ export const getCoursesWithTopics = async (req, res) => {
         res.status(500).send('Error al obtener los cursos, temas, catedráticos, posts y estudiantes');
     }
 }
+
 
 //Controlador para crear cursos
 export const createCourse = async (req, res) => {
@@ -164,8 +164,7 @@ export const getCourseById = async (req, res) => {
                 Cursos.codigo AS codigo,
                 Cursos.nombre AS Curso,
                 Cursos.descripcion AS DescripcionCurso,
-                Cursos.año AS año,
-                Cursos.creditos AS Creditos,
+                Cursos.año AS año
                 JSON_ARRAYAGG(
                     JSON_OBJECT(
                         'id', Temas.id,
@@ -211,8 +210,7 @@ export const getCoursesWithTopicsExcel = async (req, res) => {
                 codigo AS Codigo,
                 nombre,
                 descripcion,
-                año,
-                creditos
+                año
             FROM 
                 Cursos
         `);
@@ -275,8 +273,7 @@ export const getCourseByIdExcel = async (req, res) => {
                 codigo AS Codigo,
                 nombre,
                 descripcion,
-                año,
-                creditos
+                año
             FROM 
                 Cursos
             WHERE
@@ -342,8 +339,7 @@ export const getCoursesWithTopicsPDF = async (req, res) => {
                 id,
                 codigo,
                 nombre,
-                descripcion,
-                año
+                descripcion
             FROM 
                 Cursos
         `);
@@ -382,7 +378,6 @@ export const getCourseByIdPDF = async (req, res) => {
                 Cursos.codigo AS Codigo,
                 Cursos.nombre AS NombreCurso,
                 Cursos.descripcion AS DescripcionCurso,
-                Cursos.año AS Año,
                 Temas.id AS IdTema,
                 Temas.nombre AS NombreTema,
                 Temas.descripcion AS DescripcionTema

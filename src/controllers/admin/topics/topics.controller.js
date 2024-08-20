@@ -13,8 +13,7 @@ export const getTopics = async (req, res) => {
                     'codigo', Cursos.codigo,
                     'nombre', Cursos.nombre,
                     'descripcion', Cursos.descripcion,
-                    'semestre', Cursos.semestre,
-                    'creditos', Cursos.creditos
+                    'año', Cursos.año
                 ) AS curso,
                 (
                     SELECT JSON_ARRAYAGG(

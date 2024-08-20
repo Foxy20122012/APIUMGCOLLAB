@@ -4,10 +4,10 @@ CREATE TABLE Usuarios (
     nombre VARCHAR(255) NOT NULL,
     correo VARCHAR(255) NOT NULL UNIQUE,
     contraseña VARCHAR(255) NOT NULL,
-    rol ENUM('superadmin', 'administrador', 'usuario') NOT NULL
+    rol ENUM('superadmin', 'administrador', 'usuario','Qa') NOT NULL
 );
 //Agregar dos campos mas a la tabla de usuarios
-fecha_nacimiento DATE,
+
     activado BOOLEAN DEFAULT FALSE,
 
 //Agregando campos para imagen, telefono y apellido de Usuarios.
@@ -18,6 +18,8 @@ ADD COLUMN apellido VARCHAR(255) AFTER telefono;
 ALTER TABLE usuarios
 ADD COLUMN puesto VARCHAR(255),
 ADD COLUMN id_posicion INT;
+ADD fecha_nacimiento DATE;
+ADD ctivado BOOLEAN DEFAULT TRUE;
 
 
 
@@ -30,8 +32,7 @@ CREATE TABLE Cursos (
     codigo VARCHAR(10) NOT NULL UNIQUE,
     nombre VARCHAR(255) NOT NULL,
     descripcion TEXT,
-    creditos INT,
-    semestre INT
+    año INT
 );
 
 ALTER TABLE Cursos
@@ -80,7 +81,7 @@ CREATE TABLE Posts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(255) NOT NULL,
     contenido TEXT NOT NULL,
-    estado ENUM('pendiente', 'aprobado') NOT NULL DEFAULT 'pendiente',
+    estado ENUM('pendiente', 'aprobado','rechazado') NOT NULL DEFAULT 'pendiente',
     visible BOOLEAN DEFAULT TRUE,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -101,14 +102,16 @@ CREATE TABLE Temas (
     descripcion TEXT,
     curso_id INT,
     FOREIGN KEY (curso_id) REFERENCES Cursos(id)
-);ALTER TABLE Temas ADD COLUMN nombre_curso VARCHAR(255);
+);
+
+ALTER TABLE Temas ADD COLUMN nombre_curso VARCHAR(255);
 
 
 
 //Datos de prueba
 //Curso
-INSERT INTO Cursos (codigo, nombre, descripcion, creditos, semestre)
-VALUES ('IA101', 'Inteligencia Artificial', 'Curso sobre los fundamentos y aplicaciones de la inteligencia artificial.', 4, 6);
+INSERT INTO Cursos (codigo, nombre, descripcion)
+VALUES ('IA101', 'Inteligencia Artificial', 'Curso sobre los fundamentos y aplicaciones de la inteligencia artificial.');
 
 
 //Tabla de estudiantes
@@ -125,6 +128,7 @@ ADD COLUMN fecha_nacimiento DATE,
 ADD COLUMN genero VARCHAR(10),
 ADD COLUMN telefono VARCHAR(20),
 ADD COLUMN direccion TEXT;
+
 ALTER TABLE Estudiantes
 ADD COLUMN contraseña VARCHAR(255)
 
@@ -147,6 +151,7 @@ CREATE TABLE curso_estudiante (
     FOREIGN KEY (estudiante_id) REFERENCES Estudiantes(id),
     PRIMARY KEY (curso_id, estudiante_id)
 );
+
 ALTER TABLE curso_estudiante
 ADD COLUMN nombre_curso VARCHAR(255),
 ADD COLUMN fecha_asignacion DATE,
