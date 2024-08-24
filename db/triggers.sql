@@ -1,5 +1,29 @@
 //Trigger para crear un Identificador Unico universal para generar el codigo de la tabla cursos
 
+/*Trigger nuevo*/
+DELIMITER //
+
+CREATE TRIGGER before_insert_curso
+BEFORE INSERT ON Cursos
+FOR EACH ROW
+BEGIN
+    DECLARE last_code INT;
+
+    -- Obtener el valor numérico más alto del código actual
+    SELECT IFNULL(MAX(CAST(SUBSTRING(codigo, 7) AS UNSIGNED)), 0) INTO last_code FROM Cursos;
+
+    -- Generar el nuevo código incrementando el valor numérico
+    SET NEW.codigo = CONCAT('Curso-', LPAD(last_code + 1, 5, '0'));
+END;
+//
+
+DELIMITER ;
+
+
+
+
+/*trigger viejo*/
+/*
 DELIMITER //
 CREATE TRIGGER before_insert_curso
 BEFORE INSERT ON Cursos
@@ -9,7 +33,7 @@ BEGIN
 END;
 //
 DELIMITER ;
-
+*/
 
 //  trigger que se ejecute antes de insertar en curso_catedratico y que
  busque los IDs correspondientes a partir de los nombres proporcionados

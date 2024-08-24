@@ -16,13 +16,15 @@ export const getTopics = async (req, res) => {
                     'año', Cursos.año
                 ) AS curso,
                 (
-                    SELECT JSON_ARRAYAGG(
-                        JSON_OBJECT(
-                            'id', catedraticos.id,
-                            'nombre', catedraticos.nombre,
-                            'titulo', catedraticos.titulo,
-                            'email', catedraticos.email
-                        )
+                    SELECT IFNULL(
+                        JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'id', catedraticos.id,
+                                'nombre', catedraticos.nombre,
+                                'titulo', catedraticos.titulo,
+                                'email', catedraticos.email
+                            )
+                        ), JSON_ARRAY()
                     )
                     FROM catedraticos
                     JOIN curso_catedratico ON catedraticos.id = curso_catedratico.catedratico_id
@@ -34,12 +36,29 @@ export const getTopics = async (req, res) => {
                 Cursos ON Temas.curso_id = Cursos.id
         `);
 
-        // Convertir la cadena 'curso' y 'catedraticos' en un objeto JSON y un arreglo de objetos JSON respectivamente para cada tema
-        const topicsWithDetails = topics.map(topic => ({
-            ...topic,
-            curso: JSON.parse(topic.curso),
-            catedraticos: JSON.parse(topic.catedraticos || '[]')
-        }));
+        const topicsWithDetails = topics.map(topic => {
+            let cursoData, catedraticosData;
+
+            try {
+                cursoData = JSON.parse(topic.curso);
+            } catch (error) {
+                console.error("Error parsing 'curso' JSON:", error);
+                cursoData = null;
+            }
+
+            try {
+                catedraticosData = JSON.parse(topic.catedraticos || '[]');
+            } catch (error) {
+                console.error("Error parsing 'catedraticos' JSON:", error);
+                catedraticosData = [];
+            }
+
+            return {
+                ...topic,
+                curso: cursoData,
+                catedraticos: catedraticosData
+            };
+        });
 
         res.json(topicsWithDetails);
     } catch (error) {
@@ -56,13 +75,13 @@ export const addTopic = async (req, res) => {
         const [curso] = await pool.query('SELECT id FROM Cursos WHERE nombre = ?', [nombre_curso]);
 
         if (curso.length === 0) {
-            return res.status(404).json({ message: 'El curso no existe' });
+            return res.status(404).json({ message: 'El curso con el nombre proporcionado no existe.' });
         }
 
         const curso_id = curso[0].id;
 
-        // Insertar el tema
-        await pool.query('INSERT INTO Temas (nombre, descripcion, curso_id) VALUES (?, ?, ?)', [nombre, descripcion, curso_id]);
+        // Insertar el tema y asignar automáticamente el id del curso relacionado
+        await pool.query('INSERT INTO Temas (nombre, descripcion, curso_id, nombre_curso) VALUES (?, ?, ?, ?)', [nombre, descripcion, curso_id, nombre_curso]);
 
         res.status(201).json({ message: 'Tema agregado exitosamente' });
     } catch (error) {
@@ -73,10 +92,9 @@ export const addTopic = async (req, res) => {
 
 
 export const updateTopic = async (req, res) => {
-    const { id, nombre, descripcion, nombre_curso } = req.body; // Asegúrate de incluir el 'id' del tema que deseas actualizar.
+    const { id, nombre, descripcion, nombre_curso } = req.body;
 
     try {
-        // Verificar si existe un curso con el nombre proporcionado.
         const [curso] = await pool.query('SELECT id FROM Cursos WHERE nombre = ?', [nombre_curso]);
 
         if (curso.length === 0) {
@@ -85,7 +103,6 @@ export const updateTopic = async (req, res) => {
 
         const curso_id = curso[0].id;
 
-        // Actualizar el tema.
         await pool.query('UPDATE Temas SET nombre = ?, descripcion = ?, curso_id = ? WHERE id = ?', [nombre, descripcion, curso_id, id]);
 
         res.json({ message: 'Tema actualizado exitosamente.' });
@@ -96,10 +113,9 @@ export const updateTopic = async (req, res) => {
 };
 
 export const deleteTopic = async (req, res) => {
-    const { id } = req.params; // El 'id' del tema viene de los parámetros de la URL.
+    const { id } = req.params;
 
     try {
-        // Eliminar el tema.
         const [result] = await pool.query('DELETE FROM Temas WHERE id = ?', [id]);
 
         if (result.affectedRows === 0) {
