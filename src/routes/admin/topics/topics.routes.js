@@ -6,7 +6,7 @@ const router = Router();
 // Ejemplo de ruta que utiliza el controlador de data
 router.get('/topics', getTopics);
 router.post('/topics', addTopic)
-router.put('/topics', updateTopic)
+router.put('/topics/:id', updateTopic);
 router.delete('/topics/:id', deleteTopic); //Route delete topics
 
 

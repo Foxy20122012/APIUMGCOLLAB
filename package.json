@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/index.js",
-    "start": "node src/index.js",
+    "dev": "nodemon src/index.js ",
+    "start": "node src/swagger.js",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "pretest": "cross-env NODE_ENV=test jest --clearCache"
   },
@@ -36,6 +36,9 @@
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "pdfkit": "^0.15.0",
+    "swagger-autogen": "^2.23.7",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "timeago.js": "^4.0.2"
   },
   "devDependencies": {

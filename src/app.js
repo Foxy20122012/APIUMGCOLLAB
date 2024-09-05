@@ -2,6 +2,9 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";//Cors encabezados http. Permite solicitar recursos restringidos en una página web desde un dominio diferente del dominio que sirvió el primer recurso
 
+import swaggerJsdoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
+import swaggerDocument from '../swagger_output.json'assert { type: 'json' };
 
 
 import indexRoutes from "./routes/index.routes.js";//Ruta principal de bievenida
@@ -17,6 +20,9 @@ import loginUsuarioRoute from './routes/login/loginUsuario.routes.js';//Endpoint
 import cursosRoute from "./routes/admin/courses/cursos.routes.js"//Endpoint del administrador para administrar los cursos
 import i18nRoute from "./routes/spr/i18n/sprI18n.routes.js"//Endpoint del admin en desarrollo para administrar el i18n
 import topicsRoute from "./routes/admin/topics/topics.routes.js"
+import categoryRoute from "./routes/admin/categorys/category.routes.js"
+import newsCategoryRoute from "./routes/admin/categorys/NewsCategory.routes.js"
+import EventDetailsRoute from "./routes/admin/categorys/Events.routes.js"
 
 //Post student
 import postStudentRoute from "./routes/students/postStudent/postStudent.routes.js"
@@ -30,6 +36,10 @@ app.use(morgan("dev"));
 app.use(cors());//Permite usar los encabezados para transmision de datos por medio de http por medio de los navegadores
 app.use(express.json());
 
+
+// Usa Swagger UI con el archivo JSON generado automáticamente
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 // Route universal routes Stored Procedured
 app.use("/api",dataRoute);
 app.use("/api", i18nRoute)
@@ -40,6 +50,9 @@ app.use("/api", dataJsonRoute)
 //Routes admin
 app.use("/api", cursosRoute)
 app.use("/api", topicsRoute)
+app.use("/api", categoryRoute)
+app.use("/api", newsCategoryRoute)
+app.use("/api", EventDetailsRoute)
 
 // Routes for the main page
 app.use("/", indexRoutes);

@@ -36,36 +36,13 @@ export const getTopics = async (req, res) => {
                 Cursos ON Temas.curso_id = Cursos.id
         `);
 
-        const topicsWithDetails = topics.map(topic => {
-            let cursoData, catedraticosData;
-
-            try {
-                cursoData = JSON.parse(topic.curso);
-            } catch (error) {
-                console.error("Error parsing 'curso' JSON:", error);
-                cursoData = null;
-            }
-
-            try {
-                catedraticosData = JSON.parse(topic.catedraticos || '[]');
-            } catch (error) {
-                console.error("Error parsing 'catedraticos' JSON:", error);
-                catedraticosData = [];
-            }
-
-            return {
-                ...topic,
-                curso: cursoData,
-                catedraticos: catedraticosData
-            };
-        });
-
-        res.json(topicsWithDetails);
+        return res.status(200).json(topics); // Asegúrate de que no falta el return
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Something went wrong" });
-    }
-};
+        console.error('Error al obtener los temas:', error);
+        return res.status(500).json({ message: 'Algo salió mal al obtener los temas.' });
+    } // <- Revisa que este corchete esté correctamente colocado
+}; // <- Revisa que el corchete final esté correcto
+
 
 export const addTopic = async (req, res) => {
     const { nombre, descripcion, nombre_curso } = req.body;
@@ -92,7 +69,8 @@ export const addTopic = async (req, res) => {
 
 
 export const updateTopic = async (req, res) => {
-    const { id, nombre, descripcion, nombre_curso } = req.body;
+    const { nombre, descripcion, nombre_curso } = req.body;
+    const { id } = req.params; // Ahora obtenemos el id de req.params
 
     try {
         const [curso] = await pool.query('SELECT id FROM Cursos WHERE nombre = ?', [nombre_curso]);

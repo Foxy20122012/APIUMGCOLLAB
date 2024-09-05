@@ -187,6 +187,47 @@ ALTER TABLE links ADD PRIMARY KEY(id);
 
 
 
+//Tabla para categorias
+
+-- Creating the Categoria table (This table stores the general category information)
+CREATE TABLE Categoria (
+    id_categoria INT PRIMARY KEY AUTO_INCREMENT,
+    numero_categoria INT UNIQUE NOT NULL,
+    id_usuario_creador INT,
+    fecha_creado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario_creador) REFERENCES Usuarios(id)
+);
+
+ALTER TABLE Categoria
+ADD COLUMN descripcion TEXT AFTER numero_categoria,
+ADD COLUMN alias VARCHAR(100) AFTER descripcion;
+
+ALTER TABLE Categoria
+ADD COLUMN estado ENUM('activo', 'inactivo') DEFAULT 'activo' AFTER alias;
+
+
+-- Creating the Categoria_Detalle table (This table stores the detailed information related to each category)
+CREATE TABLE Categoria_Detalle (
+    id_detalle INT PRIMARY KEY AUTO_INCREMENT,
+    numero_categoria INT,
+    nombre_categoria VARCHAR(100) NOT NULL,
+    codigo_categoria VARCHAR(50) UNIQUE NOT NULL,
+    descripcion TEXT,
+    alias VARCHAR(100),
+    id_usuario_creador INT,
+    fecha_creado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (numero_categoria) REFERENCES Categoria(numero_categoria),
+    FOREIGN KEY (id_usuario_creador) REFERENCES Usuarios(id)
+);
+
+ALTER TABLE Categoria_Detalle
+ADD COLUMN estado ENUM('activo', 'inactivo') DEFAULT 'activo' AFTER alias;
+
+ALTER TABLE Categoria
+ADD COLUMN nombre_categoria VARCHAR(100) AFTER numero_categoria;
+
+
+
 
 
 
