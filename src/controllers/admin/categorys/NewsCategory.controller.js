@@ -113,14 +113,22 @@ export const addNewsDetail = async (req, res) => {
 
 // Actualizar un detalle de la categoría "Noticias"
 export const updateNewsDetail = async (req, res) => {
-    const { codigo_categoria, descripcion, alias, estado } = req.body;
+    const { descripcion, alias, estado } = req.body;
     const { id } = req.params;
 
     try {
-        const nombre_usuario_actualizador = getUserFromToken(req);
+        // Recuperar el detalle actual para mantener el codigo_categoria si no se proporciona
+        const [rows] = await pool.query('SELECT codigo_categoria FROM Categoria_Detalle WHERE id_detalle = ?', [id]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'Detalle no encontrado' });
+        }
+
+        const codigo_categoria = rows[0].codigo_categoria;  // Mantener el codigo_categoria sin cambios si no se proporciona
+        const nombre_usuario_actualizador = getUserFromToken(req).nombre_usuario;
 
         const detalleActualizado = {
-            codigo_categoria,
+            codigo_categoria,  // Se mantiene sin cambios
             descripcion,
             alias,
             estado,
@@ -134,6 +142,7 @@ export const updateNewsDetail = async (req, res) => {
         res.status(500).json({ message: 'Algo salió mal al actualizar el detalle de la categoría "Noticias".' });
     }
 };
+
 
 // Eliminar un detalle de la categoría "Noticias"
 export const deleteNewsDetail = async (req, res) => {
