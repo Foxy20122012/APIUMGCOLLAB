@@ -6,7 +6,30 @@ CREATE TABLE Usuarios (
     contraseña VARCHAR(255) NOT NULL,
     rol ENUM('superadmin', 'administrador', 'usuario','Qa') NOT NULL
 );
+-- Cambiar el nombre del campo 'ctivado' a 'activo'
+ALTER TABLE Usuarios
+CHANGE COLUMN ctivado activo TINYINT(1) DEFAULT 1;
+
+-- Agregar nuevos campos a la tabla 'Usuarios'
+ALTER TABLE Usuarios
+ADD COLUMN direccion VARCHAR(255) NULL AFTER fecha_nacimiento, 
+ADD COLUMN genero ENUM('masculino', 'femenino', 'otro') NULL AFTER direccion, 
+ADD COLUMN fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP AFTER genero, 
+ADD COLUMN ultima_fecha_acceso TIMESTAMP NULL DEFAULT NULL AFTER fecha_registro, 
+ADD COLUMN numero_identificacion VARCHAR(20) NULL AFTER ultima_fecha_acceso, 
+ADD COLUMN estado_civil ENUM('soltero', 'casado', 'divorciado', 'viudo', 'otro') NULL AFTER numero_identificacion, 
+ADD COLUMN ocupacion VARCHAR(255) NULL AFTER estado_civil, 
+ADD COLUMN intereses TEXT NULL AFTER ocupacion, 
+ADD COLUMN preferencias_notificacion JSON NULL AFTER intereses, 
+ADD COLUMN email_verificado TINYINT(1) DEFAULT 0 AFTER preferencias_notificacion, 
+ADD COLUMN telefono_verificado TINYINT(1) DEFAULT 0 AFTER email_verificado, 
+ADD COLUMN firma_digital BLOB NULL AFTER telefono_verificado, 
+ADD COLUMN biometria BLOB NULL AFTER firma_digital, 
+ADD COLUMN historial_login JSON NULL AFTER biometria;
 //Agregar dos campos mas a la tabla de usuarios
+// Campo en comun entre usuario y catedraticos para actualizaciones 
+ALTER TABLE Usuarios ADD COLUMN codigo_usuario VARCHAR(255) NOT NULL AFTER id;
+ALTER TABLE Catedraticos ADD COLUMN codigo_usuario VARCHAR(255) NOT NULL AFTER id;
 
     activado BOOLEAN DEFAULT FALSE,
 
@@ -21,6 +44,7 @@ ADD COLUMN id_posicion INT;
 ADD fecha_nacimiento DATE;
 ADD ctivado BOOLEAN DEFAULT TRUE;
 
+ALTER TABLE Usuarios ADD COLUMN nombre_usuario_actualizador VARCHAR(255) DEFAULT NULL;
 
 
 

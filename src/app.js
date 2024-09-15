@@ -23,6 +23,7 @@ import topicsRoute from "./routes/admin/topics/topics.routes.js"
 import categoryRoute from "./routes/admin/categorys/category.routes.js"
 import newsCategoryRoute from "./routes/admin/categorys/NewsCategory.routes.js"
 import EventDetailsRoute from "./routes/admin/categorys/Events.routes.js"
+import RegisterCatedraticosRoute from "./routes/admin/registerProfessors/registerProfessors.routes.js"
 
 //Post student
 import postStudentRoute from "./routes/students/postStudent/postStudent.routes.js"
@@ -63,6 +64,7 @@ app.use('/api', linksRoute);
 app.use('/api', registerRoute );
 app.use("/api", loginAdminRoute)
 app.use("/api", loginUsuarioRoute);
+app.use("/api", RegisterCatedraticosRoute);
 
 //Route Student
 app.use("/api", postStudentRoute );//Route Post Student

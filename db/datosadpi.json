@@ -1,0 +1,27 @@
+
+{
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "correo": "juan.perez1@catedratico.com",
+    "contraseña": "password123",
+    "telefono": "1234567890",
+    "imagen_perfil": null,
+    "fecha_nacimiento": "1985-05-20",
+    "direccion": "123 Calle Falsa, Ciudad, País",
+    "genero": "masculino",
+    "numero_identificacion": "123456789",
+    "estado_civil": "soltero",
+    "ocupacion": "Docente",
+    "intereses": "Matemáticas, Física, quimica",
+    "preferencias_notificacion": {
+      "email": true,
+      "sms": false
+    },
+    "email_verificado": 1,
+    "telefono_verificado": 1,
+    "firma_digital": null,
+    "biometria": null,
+    "comentario": "inserciones de catedrticos a usuarios"
+  }
+  
+
