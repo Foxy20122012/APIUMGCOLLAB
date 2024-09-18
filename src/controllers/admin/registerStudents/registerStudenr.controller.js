@@ -5,36 +5,12 @@ const JWT_SECRET = '4a5b9f8c67eafcd2d3b1e5270a84e6f1';
 import { NODE_ENV } from "../../../config.js"; 
 import { v4 as uuidv4 } from 'uuid'; // Para generar el código único de usuario
 
-// Middleware para extraer el usuario del token
-const getUserFromToken = (req) => {
-    const authHeader = req.headers.authorization;
 
-    if (!authHeader) {
-        if (NODE_ENV === 'production') {
-            return {
-                id_usuario: null,
-                nombre_usuario: 'Api'
-            };
-        } else {
-            return {
-                id_usuario: null,
-                nombre_usuario: 'Develop'
-            };
-        }
-    }
 
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
-    return {
-        id_usuario: decoded.id_usuario, 
-        nombre_usuario: decoded.nombre_usuario
-    };
-};
-
-// Obtener todos los usuarios con rol catedratico
-export const getCatedraticos = async (req, res) => {
+// Obtener todos los usuarios con rol estudiante
+export const getEstudiantes = async (req, res) => {
     try {
-        const [catedraticos] = await pool.query(`
+        const [estudiantes] = await pool.query(`
             SELECT 
                 id,
                 codigo_usuario,
@@ -49,18 +25,20 @@ export const getCatedraticos = async (req, res) => {
                 fecha_registro,
                 activo
             FROM Usuarios
-            WHERE rol = 'catedratico'
+            WHERE rol = 'estudiante'
         `);
 
-        return res.status(200).json(catedraticos);
+        return res.status(200).json(estudiantes);
     } catch (error) {
-        console.error('Error al obtener los usuarios con rol catedratico:', error);
-        return res.status(500).json({ message: 'Hubo un error al obtener los catedraticos.' });
+        console.error('Error al obtener los usuarios con rol estudiante:', error);
+        return res.status(500).json({ message: 'Hubo un error al obtener los estudiantes.' });
     }
 };
 
-// Crear un nuevo usuario con rol catedratico
-export const addCatedratico = async (req, res) => {
+
+
+// Crear un nuevo usuario con rol estudiante
+export const addEstudiante = async (req, res) => {
     const { nombre, apellido, correo, contraseña, telefono, direccion, fecha_nacimiento } = req.body;
 
     try {
@@ -79,10 +57,10 @@ export const addCatedratico = async (req, res) => {
         const hashedPassword = await bcrypt.hash(contraseña, 10);
 
         // Generar un codigo_usuario único
-        const codigo_usuario = `CAT-${uuidv4().slice(0, 8).toUpperCase()}`; // Código de usuario basado en uuid
+        const codigo_usuario = `EST-${uuidv4().slice(0, 8).toUpperCase()}`; // Código de usuario basado en uuid
 
         // Crear el objeto para insertar
-        const nuevoCatedratico = {
+        const nuevoEstudiante = {
             codigo_usuario,
             nombre,
             apellido,
@@ -91,26 +69,29 @@ export const addCatedratico = async (req, res) => {
             telefono: telefono || null, // Si no se proporciona, se guarda como NULL
             direccion: direccion || null,
             fecha_nacimiento: fecha_nacimiento || null,
-            rol: 'catedratico', // Valor por defecto
-            puesto: 'catedratico', // Valor por defecto
+            rol: 'estudiante', // Valor por defecto
+            puesto: 'estudiante', // Valor por defecto
             fecha_registro: new Date(), // Se asigna la fecha actual al registrarse
             activo: 1, // Activo por defecto
             email_verificado: 0, // Inicialmente no verificado
             telefono_verificado: 0 // Inicialmente no verificado
         };
 
-        // Insertar el nuevo catedrático en la base de datos
-        await pool.query('INSERT INTO Usuarios SET ?', [nuevoCatedratico]);
+        // Insertar el nuevo estudiante en la base de datos
+        await pool.query('INSERT INTO Usuarios SET ?', [nuevoEstudiante]);
 
-        res.status(201).json({ message: 'Catedrático creado exitosamente', codigo_usuario });
+        res.status(201).json({ message: 'Estudiante creado exitosamente', codigo_usuario });
     } catch (error) {
-        console.error('Error al crear el catedrático:', error);
-        res.status(500).json({ message: 'Hubo un error al crear el catedrático. Por favor, intenta de nuevo.' });
+        console.error('Error al crear el estudiante:', error);
+        res.status(500).json({ message: 'Hubo un error al crear el estudiante. Por favor, intenta de nuevo.' });
     }
 };
 
-export const updateCatedratico = async (req, res) => {
-    const { id } = req.params;  // El ID del usuario a actualizar
+
+
+// Actualizar un estudiante existente
+export const updateEstudiante = async (req, res) => {
+    const { id } = req.params;
     const { nombre, apellido, correo, telefono, direccion, fecha_nacimiento, ocupacion, intereses, preferencias_notificacion, activo, email_verificado, telefono_verificado, contraseña } = req.body;
 
     try {
@@ -141,32 +122,34 @@ export const updateCatedratico = async (req, res) => {
         }
 
         // Ejecutamos la consulta de actualización
-        await pool.query('UPDATE Usuarios SET ? WHERE id = ?', [datosActualizados, id]);
+        await pool.query('UPDATE Usuarios SET ? WHERE id = ? AND rol = ?', [datosActualizados, id, 'estudiante']);
 
-        res.status(200).json({ message: 'Catedrático actualizado exitosamente' });
+        res.status(200).json({ message: 'Estudiante actualizado exitosamente' });
     } catch (error) {
-        console.error('Error al actualizar el catedrático:', error);
-        res.status(500).json({ message: 'Algo salió mal al actualizar el catedrático.' });
+        console.error('Error al actualizar el estudiante:', error);
+        res.status(500).json({ message: 'Algo salió mal al actualizar el estudiante.' });
     }
 };
 
 
 
-
-// Eliminar un catedratico
-export const deleteCatedratico = async (req, res) => {
+// Eliminar un estudiante
+export const deleteEstudiante = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const [result] = await pool.query('DELETE FROM Usuarios WHERE id = ? AND rol = ?', [id, 'catedratico']);
+        const [result] = await pool.query('DELETE FROM Usuarios WHERE id = ? AND rol = ?', [id, 'estudiante']);
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ message: 'No se encontró un catedrático con el id proporcionado.' });
+            return res.status(404).json({ message: 'No se encontró un estudiante con el id proporcionado.' });
         }
 
-        res.json({ message: 'Catedrático eliminado exitosamente.' });
+        res.json({ message: 'Estudiante eliminado exitosamente.' });
     } catch (error) {
-        console.error('Error al eliminar el catedrático:', error);
-        res.status(500).json({ message: 'Hubo un error al intentar eliminar el catedrático.' });
+        console.error('Error al eliminar el estudiante:', error);
+        res.status(500).json({ message: 'Hubo un error al intentar eliminar el estudiante.' });
     }
 };
+
+
+

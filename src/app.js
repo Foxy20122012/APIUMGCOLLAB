@@ -24,6 +24,7 @@ import categoryRoute from "./routes/admin/categorys/category.routes.js"
 import newsCategoryRoute from "./routes/admin/categorys/NewsCategory.routes.js"
 import EventDetailsRoute from "./routes/admin/categorys/Events.routes.js"
 import RegisterCatedraticosRoute from "./routes/admin/registerProfessors/registerProfessors.routes.js"
+import RegisterStudentRoute from "./routes/admin/registerStudent/registerStudent.routes.js"
 
 //Post student
 import postStudentRoute from "./routes/students/postStudent/postStudent.routes.js"
@@ -65,6 +66,7 @@ app.use('/api', registerRoute );
 app.use("/api", loginAdminRoute)
 app.use("/api", loginUsuarioRoute);
 app.use("/api", RegisterCatedraticosRoute);
+app.use("/api", RegisterStudentRoute);
 
 //Route Student
 app.use("/api", postStudentRoute );//Route Post Student
