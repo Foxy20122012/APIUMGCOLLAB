@@ -5,7 +5,31 @@ const JWT_SECRET = '4a5b9f8c67eafcd2d3b1e5270a84e6f1';
 import { NODE_ENV } from "../../../config.js"; 
 import { v4 as uuidv4 } from 'uuid'; // Para generar el código único de usuario
 
+// Middleware para extraer el usuario del token
+const getUserFromToken = (req) => {
+    const authHeader = req.headers.authorization;
 
+    if (!authHeader) {
+        if (NODE_ENV === 'production') {
+            return {
+                id_usuario: null,
+                nombre_usuario: 'Api'
+            };
+        } else {
+            return {
+                id_usuario: null,
+                nombre_usuario: 'Develop'
+            };
+        }
+    }
+
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, JWT_SECRET);
+    return {
+        id_usuario: decoded.id_usuario, 
+        nombre_usuario: decoded.nombre_usuario
+    };
+};
 
 // Obtener todos los usuarios con rol estudiante
 export const getEstudiantes = async (req, res) => {
@@ -34,8 +58,6 @@ export const getEstudiantes = async (req, res) => {
         return res.status(500).json({ message: 'Hubo un error al obtener los estudiantes.' });
     }
 };
-
-
 
 // Crear un nuevo usuario con rol estudiante
 export const addEstudiante = async (req, res) => {
@@ -87,8 +109,6 @@ export const addEstudiante = async (req, res) => {
     }
 };
 
-
-
 // Actualizar un estudiante existente
 export const updateEstudiante = async (req, res) => {
     const { id } = req.params;
@@ -131,8 +151,6 @@ export const updateEstudiante = async (req, res) => {
     }
 };
 
-
-
 // Eliminar un estudiante
 export const deleteEstudiante = async (req, res) => {
     const { id } = req.params;
@@ -150,6 +168,3 @@ export const deleteEstudiante = async (req, res) => {
         res.status(500).json({ message: 'Hubo un error al intentar eliminar el estudiante.' });
     }
 };
-
-
-
