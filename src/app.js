@@ -25,9 +25,10 @@ import newsCategoryRoute from "./routes/admin/categorys/NewsCategory.routes.js"
 import EventDetailsRoute from "./routes/admin/categorys/Events.routes.js"
 import RegisterCatedraticosRoute from "./routes/admin/registerProfessors/registerProfessors.routes.js"
 import RegisterStudentRoute from "./routes/admin/registerStudent/registerStudent.routes.js"
+import PostsRoute from "./routes/general/post/post.routes.js"//Endpoint para los post
 
 //Post student
-import postStudentRoute from "./routes/students/postStudent/postStudent.routes.js"
+//import postStudentRoute from "./routes/students/postStudent/postStudent.routes.js"
 
 //Router profile user
 import getProfileUserRoute from "./routes/general/profile.routes.js"
@@ -69,10 +70,11 @@ app.use("/api", RegisterCatedraticosRoute);
 app.use("/api", RegisterStudentRoute);
 
 //Route Student
-app.use("/api", postStudentRoute );//Route Post Student
+//app.use("/api", postStudentRoute );//Route Post Student
 
 //Route Profile User
 app.use("/api", getProfileUserRoute);
+app.use("/api", PostsRoute)
 
 
 
