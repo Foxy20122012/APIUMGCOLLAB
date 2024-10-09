@@ -3,6 +3,7 @@ import { pool } from '../../../../db.js';
 import { getUserFromToken } from '../../../../utils/token.js';
 
 // Agregar un nuevo post
+// Agregar un nuevo post
 export const addPost = async (req, res) => {
   const { titulo, contenido, descripcion, fecha_evento, ubicacion_evento, prioridad, estado, nombre_curso, tipo_post } = req.body;
 
@@ -14,9 +15,7 @@ export const addPost = async (req, res) => {
   }
 
   let user = getUserFromToken(req);
-
   if (!user) {
-    // Si no hay token, asignar el usuario por defecto "develop"
     console.log("No token provided, assigning default user 'develop'.");
     user = { id: 13, nombre: 'develop' };
   }
@@ -24,10 +23,8 @@ export const addPost = async (req, res) => {
   const { id, nombre } = user;
 
   try {
-    // Definir estado y visibilidad basados en el rol del usuario
     let postEstado = estado || 'pendiente';
     let postVisible = false;
-
     if (user.rol === 'administrador' || user.rol === 'catedratico') {
       postEstado = 'aprobado';
       postVisible = true;
@@ -44,9 +41,9 @@ export const addPost = async (req, res) => {
       estado: postEstado,
       visible: postVisible,
       tipo_post,
-      autor_id: id, 
-      autor_nombre: nombre, 
-      nombre: nombre_curso, 
+      autor_id: id,
+      autor_nombre: nombre,
+      nombre: nombre_curso,
       fecha_creacion: new Date(),
     };
 
@@ -58,30 +55,34 @@ export const addPost = async (req, res) => {
 
     const postId = postResult.insertId;
 
-    // Procesar la subida de imágenes si existen
+    // Subir imágenes a Cloudinary directamente desde el buffer
     let uploadedImages = [];
     if (req.files && req.files.imagenes && req.files.imagenes.length > 0) {
-      const uploadPromises = req.files.imagenes.map((file) =>
-        cloudinary.uploader.upload(file.path, { folder: 'posts' })
-      );
-      const imageResults = await Promise.all(uploadPromises);
-      uploadedImages = imageResults.map((result) => ({
-        url: result.secure_url,
-        public_id: result.public_id,
-      }));
+      const uploadPromises = req.files.imagenes.map((file) => {
+        return new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream({ folder: 'posts' }, (error, result) => {
+            if (error) reject(error);
+            resolve({ url: result.secure_url, public_id: result.public_id });
+          });
+          uploadStream.end(file.buffer); // Subir el archivo desde el buffer
+        });
+      });
+      uploadedImages = await Promise.all(uploadPromises);
     }
 
-    // Procesar la subida de archivos si existen
+    // Subir archivos adjuntos a Cloudinary directamente desde el buffer
     let uploadedFiles = [];
     if (req.files && req.files.archivos && req.files.archivos.length > 0) {
-      const uploadFilePromises = req.files.archivos.map((file) =>
-        cloudinary.uploader.upload(file.path, { folder: 'documentos' })
-      );
-      const fileResults = await Promise.all(uploadFilePromises);
-      uploadedFiles = fileResults.map((result) => ({
-        url: result.secure_url,
-        public_id: result.public_id,
-      }));
+      const uploadFilePromises = req.files.archivos.map((file) => {
+        return new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream({ folder: 'documentos' }, (error, result) => {
+            if (error) reject(error);
+            resolve({ url: result.secure_url, public_id: result.public_id });
+          });
+          uploadStream.end(file.buffer); // Subir el archivo desde el buffer
+        });
+      });
+      uploadedFiles = await Promise.all(uploadFilePromises);
     }
 
     // Actualizar el post con las URLs de las imágenes y archivos
@@ -104,6 +105,7 @@ export const addPost = async (req, res) => {
     return res.status(500).json({ message: 'Error interno al crear el post.', error: error.message });
   }
 };
+
 
 // Obtener todos los posts
 export const getAllPosts = async (req, res) => {
