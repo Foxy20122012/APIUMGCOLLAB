@@ -2,18 +2,19 @@ import cloudinary from '../../../../config/cloudinary.js';
 import { pool } from '../../../../db.js';
 import { getUserFromToken } from '../../../../utils/token.js';
 
-// Agregar un nuevo post
+
 // Agregar un nuevo post
 export const addPost = async (req, res) => {
   const { titulo, contenido, descripcion, fecha_evento, ubicacion_evento, prioridad, estado, nombre_curso, tipo_post } = req.body;
 
-  // Validar campos requeridos
+  // Verificación de datos obligatorios
   if (!titulo || !contenido || !descripcion || !fecha_evento || !ubicacion_evento || !prioridad || !nombre_curso || !tipo_post) {
-    return res.status(400).json({
-      message: 'Faltan datos obligatorios. Por favor, completa todos los campos requeridos.',
-    });
+    return res.status(400).json({ message: 'Faltan datos obligatorios.' });
   }
 
+  console.log("archivos recibidos del frontend archivos", req.files); // Esto imprimirá los archivos que se están recibiendo.
+
+  // Obtener el usuario desde el token o asignar usuario por defecto
   let user = getUserFromToken(req);
   if (!user) {
     console.log("No token provided, assigning default user 'develop'.");
@@ -23,6 +24,7 @@ export const addPost = async (req, res) => {
   const { id, nombre } = user;
 
   try {
+    // Definir estado del post basado en el rol del usuario
     let postEstado = estado || 'pendiente';
     let postVisible = false;
     if (user.rol === 'administrador' || user.rol === 'catedratico') {
@@ -55,14 +57,14 @@ export const addPost = async (req, res) => {
 
     const postId = postResult.insertId;
 
-    // Subir imágenes a Cloudinary directamente desde el buffer
+    // Subir imágenes a Cloudinary
     let uploadedImages = [];
     if (req.files && req.files.imagenes && req.files.imagenes.length > 0) {
       const uploadPromises = req.files.imagenes.map((file) => {
         return new Promise((resolve, reject) => {
           const uploadStream = cloudinary.uploader.upload_stream({ folder: 'posts' }, (error, result) => {
             if (error) reject(error);
-            resolve({ url: result.secure_url, public_id: result.public_id });
+            else resolve({ url: result.secure_url, public_id: result.public_id });
           });
           uploadStream.end(file.buffer); // Subir el archivo desde el buffer
         });
@@ -70,14 +72,17 @@ export const addPost = async (req, res) => {
       uploadedImages = await Promise.all(uploadPromises);
     }
 
-    // Subir archivos adjuntos a Cloudinary directamente desde el buffer
+    // Subir archivos adjuntos a Cloudinary (archivos no imágenes)
     let uploadedFiles = [];
     if (req.files && req.files.archivos && req.files.archivos.length > 0) {
       const uploadFilePromises = req.files.archivos.map((file) => {
         return new Promise((resolve, reject) => {
-          const uploadStream = cloudinary.uploader.upload_stream({ folder: 'documentos' }, (error, result) => {
+          const uploadStream = cloudinary.uploader.upload_stream({ 
+            folder: 'documentos', 
+            resource_type: 'raw'  // Importante para subir archivos no imágenes (como .docx, .pdf, etc.)
+          }, (error, result) => {
             if (error) reject(error);
-            resolve({ url: result.secure_url, public_id: result.public_id });
+            else resolve({ url: result.secure_url, public_id: result.public_id });
           });
           uploadStream.end(file.buffer); // Subir el archivo desde el buffer
         });
@@ -85,7 +90,7 @@ export const addPost = async (req, res) => {
       uploadedFiles = await Promise.all(uploadFilePromises);
     }
 
-    // Actualizar el post con las URLs de las imágenes y archivos
+    // Actualizar el post con las URLs de las imágenes y archivos adjuntos
     const updatedPostData = {
       imagenes: uploadedImages.length > 0 ? JSON.stringify(uploadedImages) : null,
       archivos_adjuntos: uploadedFiles.length > 0 ? JSON.stringify(uploadedFiles) : null,
@@ -105,7 +110,6 @@ export const addPost = async (req, res) => {
     return res.status(500).json({ message: 'Error interno al crear el post.', error: error.message });
   }
 };
-
 
 // Obtener todos los posts
 export const getAllPosts = async (req, res) => {

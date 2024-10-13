@@ -1,9 +1,7 @@
 // src/config/multer.js
-
 import multer from 'multer';
 
-// Configuración para almacenar archivos en buffer
-const storage = multer.memoryStorage();
+const storage = multer.memoryStorage(); // Almacenamiento en memoria para subir a Cloudinary directamente
 
 const upload = multer({ storage: storage });
 
