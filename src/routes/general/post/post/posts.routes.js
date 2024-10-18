@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { addPost, getAllPosts, getPostById, updatePostById, deletePostById } from "../../../controllers/general/profile/post/post.controller.js";
-import upload from "../../../config/multer.js"; // Configuración de multer para manejar las subidas de archivos
+import { addPost, getAllPosts, getPostById, updatePostById, deletePostById } from "../../../../controllers/general/profile/post/post/post.controller.js";
+import upload from "../../../../config/multer.js"; // Configuración de multer para manejar las subidas de archivos
 
 const router = Router();
 

@@ -25,7 +25,7 @@ import newsCategoryRoute from "./routes/admin/categorys/NewsCategory.routes.js"
 import EventDetailsRoute from "./routes/admin/categorys/Events.routes.js"
 import RegisterCatedraticosRoute from "./routes/admin/registerProfessors/registerProfessors.routes.js"
 import RegisterStudentRoute from "./routes/admin/registerStudent/registerStudent.routes.js"
-import PostsRoute from "./routes/general/post/post.routes.js"//Endpoint para los post
+import PostsRoute from "./routes/general/post/post/posts.routes.js"//Endpoint para los post
 
 //Post student
 //import postStudentRoute from "./routes/students/postStudent/postStudent.routes.js"

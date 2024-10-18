@@ -116,6 +116,11 @@ CREATE TABLE Posts (
 );
 ALTER TABLE Posts ADD nombre VARCHAR(255) NOT NULL;
 
+ALTER TABLE Posts
+ADD COLUMN ubicacion_detallada VARCHAR(255),
+ADD COLUMN url_externa JSON,
+ADD COLUMN tipo_contenido VARCHAR(50),
+ADD COLUMN fecha_publicacion DATETIME;
 
 
 //Tabla de temas
