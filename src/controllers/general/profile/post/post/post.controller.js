@@ -4,134 +4,153 @@ import { getUserFromToken } from '../../../../../utils/token.js';
 
 
 // Agregar un nuevo post
+// Agregar un nuevo post
 export const addPost = async (req, res) => {
-    const { 
-      titulo, 
-      contenido, 
-      descripcion, 
-      fecha_evento, 
-      ubicacion_evento, 
-      prioridad, 
-      estado, 
-      nombre_curso, 
-      tipo_post, 
-      ubicacion_detallada, 
-      url_externa, 
-      tipo_contenido, 
-      fecha_publicacion 
-    } = req.body;
-  
-    // Verificación de datos obligatorios
-    if (!titulo || !contenido || !descripcion || !fecha_evento || !ubicacion_evento || !prioridad || !nombre_curso || !tipo_post) {
-      return res.status(400).json({ message: 'Faltan datos obligatorios.' });
-    }
-  
-    console.log("archivos recibidos del frontend archivos", req.files); // Esto imprimirá los archivos que se están recibiendo.
-  
-    // Obtener el usuario desde el token o asignar usuario por defecto
-    let user = getUserFromToken(req);
-    if (!user) {
-      console.log("No token provided, assigning default user 'develop'.");
-      user = { id: 13, nombre: 'develop' };
-    }
-  
-    const { id, nombre } = user;
-  
-    try {
-      // Definir estado del post basado en el rol del usuario
-      let postEstado = estado || 'pendiente';
-      let postVisible = false;
-      let fechaCreacion = null; // Inicialmente la fecha es null
-  
-      if (user.rol === 'administrador' || user.rol === 'catedratico') {
-        postEstado = 'aprobado';
-        postVisible = true;
-        fechaCreacion = new Date(); // Solo asignar fecha si el rol es administrador o catedratico
-      }
-  
-      // Crear el post en la base de datos primero
-      const newPost = {
-        titulo,
-        contenido,
-        descripcion,
-        fecha_evento,
-        ubicacion_evento,
-        prioridad,
-        estado: postEstado,
-        visible: postVisible,
-        tipo_post,
-        autor_id: id,
-        autor_nombre: nombre,
-        nombre: nombre_curso,
-        fecha_creacion: fechaCreacion, // La fecha se asigna o se deja como null
-        ubicacion_detallada: ubicacion_detallada || null, 
-        url_externa: url_externa ? JSON.stringify(url_externa) : null, 
-        tipo_contenido: tipo_contenido || null, 
-        fecha_publicacion: fecha_publicacion || null 
-      };
-  
-      const [postResult] = await pool.query('INSERT INTO Posts SET ?', [newPost]);
-  
-      if (postResult.affectedRows === 0) {
-        return res.status(500).json({ message: 'No se pudo crear el post.' });
-      }
-  
-      const postId = postResult.insertId;
-  
-      // Subir imágenes a Cloudinary
-      let uploadedImages = [];
-      if (req.files && req.files.imagenes && req.files.imagenes.length > 0) {
-        const uploadPromises = req.files.imagenes.map((file) => {
-          return new Promise((resolve, reject) => {
-            const uploadStream = cloudinary.uploader.upload_stream({ folder: 'posts' }, (error, result) => {
-              if (error) reject(error);
-              else resolve({ url: result.secure_url, public_id: result.public_id });
-            });
-            uploadStream.end(file.buffer); // Subir el archivo desde el buffer
-          });
-        });
-        uploadedImages = await Promise.all(uploadPromises);
-      }
-  
-      // Subir archivos adjuntos a Cloudinary (archivos no imágenes)
-      let uploadedFiles = [];
-      if (req.files && req.files.archivos && req.files.archivos.length > 0) {
-        const uploadFilePromises = req.files.archivos.map((file) => {
-          return new Promise((resolve, reject) => {
-            const uploadStream = cloudinary.uploader.upload_stream({ 
-              folder: 'documentos', 
-              resource_type: 'raw'  // Importante para subir archivos no imágenes (como .docx, .pdf, etc.)
-            }, (error, result) => {
-              if (error) reject(error);
-              else resolve({ url: result.secure_url, public_id: result.public_id });
-            });
-            uploadStream.end(file.buffer); // Subir el archivo desde el buffer
-          });
-        });
-        uploadedFiles = await Promise.all(uploadFilePromises);
-      }
-  
-      // Actualizar el post con las URLs de las imágenes y archivos adjuntos
-      const updatedPostData = {
-        imagenes: uploadedImages.length > 0 ? JSON.stringify(uploadedImages) : null,
-        archivos_adjuntos: uploadedFiles.length > 0 ? JSON.stringify(uploadedFiles) : null,
-        cloudinary_folder: 'posts',
-      };
-  
-      await pool.query('UPDATE Posts SET ? WHERE id = ?', [updatedPostData, postId]);
-  
-      return res.status(201).json({
-        message: 'Post creado y archivos subidos exitosamente.',
-        postId,
-        uploadedImages,
-        uploadedFiles,
-      });
-    } catch (error) {
-      console.error('Error al crear el post:', error);
-      return res.status(500).json({ message: 'Error interno al crear el post.', error: error.message });
-    }
+  const { 
+    titulo, 
+    tema, // Cambiado de 'contenido' a 'tema' aquí
+    descripcion, 
+    fecha_evento, 
+    ubicacion_evento, 
+    prioridad, 
+    estado, 
+    nombre_curso, 
+    tipo_post, 
+    ubicacion_detallada, 
+    url_externa, 
+    tipo_contenido, 
+    fecha_publicacion 
+  } = req.body;
+
+  // Lista de campos requeridos y verificación de los que faltan
+  const requiredFields = {
+    titulo,
+    tema, // Cambiado 'contenido' a 'tema'
+    descripcion,
+    fecha_evento,
+    ubicacion_evento,
+    prioridad,
+    nombre_curso,
+    tipo_post
   };
-  
+
+  const missingFields = Object.keys(requiredFields).filter(field => !requiredFields[field]);
+
+  if (missingFields.length > 0) {
+    return res.status(400).json({ 
+      message: 'Faltan datos obligatorios.',
+      missingFields 
+    });
+  }
+
+  console.log("archivos recibidos del frontend archivos", req.files);
+
+  // Obtener el usuario desde el token o asignar usuario por defecto
+  let user = getUserFromToken(req);
+  if (!user) {
+    console.log("No token provided, assigning default user 'develop'.");
+    user = { id: 13, nombre: 'develop' };
+  }
+
+  const { id, nombre } = user;
+
+  try {
+    // Definir estado del post basado en el rol del usuario
+    let postEstado = estado || 'pendiente';
+    let postVisible = false;
+    let fechaCreacion = null;
+
+    if (user.rol === 'administrador' || user.rol === 'catedratico') {
+      postEstado = 'aprobado';
+      postVisible = true;
+      fechaCreacion = new Date();
+    }
+
+    // Crear el post en la base de datos
+    const newPost = {
+      titulo,
+      contenido: tema || null, // Guardar `tema` en `contenido` si aplica
+      descripcion,
+      fecha_evento,
+      ubicacion_evento,
+      prioridad,
+      estado: postEstado,
+      visible: postVisible,
+      tipo_post,
+      autor_id: id,
+      autor_nombre: nombre,
+      nombre: nombre_curso,
+      fecha_creacion: fechaCreacion,
+      ubicacion_detallada: ubicacion_detallada || null,
+      url_externa: url_externa ? JSON.stringify(url_externa) : null,
+      tipo_contenido: tipo_contenido || null,
+      fecha_publicacion: fecha_publicacion || null
+    };
+
+    const [postResult] = await pool.query('INSERT INTO Posts SET ?', [newPost]);
+
+    if (postResult.affectedRows === 0) {
+      return res.status(500).json({ message: 'No se pudo crear el post.' });
+    }
+
+    const postId = postResult.insertId;
+
+    // Subir imágenes a Cloudinary
+    let uploadedImages = [];
+    if (req.files && req.files.imagenes && req.files.imagenes.length > 0) {
+      const uploadPromises = req.files.imagenes.map((file) => {
+        return new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream({ folder: 'posts' }, (error, result) => {
+            if (error) reject(error);
+            else resolve({ url: result.secure_url, public_id: result.public_id });
+          });
+          uploadStream.end(file.buffer);
+        });
+      });
+      uploadedImages = await Promise.all(uploadPromises);
+    }
+
+    // Subir archivos adjuntos a Cloudinary (archivos no imágenes)
+    let uploadedFiles = [];
+    if (req.files && req.files.archivos && req.files.archivos.length > 0) {
+      const uploadFilePromises = req.files.archivos.map((file) => {
+        return new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream({ 
+            folder: 'documentos', 
+            resource_type: 'raw'
+          }, (error, result) => {
+            if (error) reject(error);
+            else resolve({ url: result.secure_url, public_id: result.public_id });
+          });
+          uploadStream.end(file.buffer);
+        });
+      });
+      uploadedFiles = await Promise.all(uploadFilePromises);
+    }
+
+    // Actualizar el post con las URLs de las imágenes y archivos adjuntos
+    const updatedPostData = {
+      imagenes: uploadedImages.length > 0 ? JSON.stringify(uploadedImages) : null,
+      archivos_adjuntos: uploadedFiles.length > 0 ? JSON.stringify(uploadedFiles) : null,
+      cloudinary_folder: 'posts',
+    };
+
+    await pool.query('UPDATE Posts SET ? WHERE id = ?', [updatedPostData, postId]);
+
+    return res.status(201).json({
+      message: 'Post creado y archivos subidos exitosamente.',
+      postId,
+      uploadedImages,
+      uploadedFiles,
+    });
+  } catch (error) {
+    console.error('Error al crear el post:', error);
+    return res.status(500).json({ message: 'Error interno al crear el post.', error: error.message });
+  }
+};
+
+
+
   
   
 
