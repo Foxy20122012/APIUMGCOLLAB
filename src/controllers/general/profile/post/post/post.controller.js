@@ -180,6 +180,88 @@ export const getPostById = async (req, res) => {
   }
 };
 
+
+
+
+export const getVisibleEventPosts = async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM Posts WHERE visible = 0 AND tipo_post = "evento"'
+    );
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error('Error al obtener los eventos visibles:', error);
+    res.status(500).json({ message: 'Error al obtener los eventos visibles.', error: error.message });
+  }
+};
+
+
+//Visibilidad de post
+export const getVisiblePosts = async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM Posts WHERE visible = 0 AND tipo_post = "post"'
+    );
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error('Error al obtener los eventos visibles:', error);
+    res.status(500).json({ message: 'Error al obtener los eventos visibles.', error: error.message });
+  }
+};
+
+
+//Visibilidad de noticias
+export const getVisibleNewsPosts = async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM Posts WHERE visible = 0 AND tipo_post = "noticia"'
+    );
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error('Error al obtener los eventos visibles:', error);
+    res.status(500).json({ message: 'Error al obtener los eventos visibles.', error: error.message });
+  }
+};
+
+//Visibilidad de noticias
+export const getVisibleEventsPosts = async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM Posts WHERE visible = 0 AND tipo_post = "evento"'
+    );
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error('Error al obtener los eventos visibles:', error);
+    res.status(500).json({ message: 'Error al obtener los eventos visibles.', error: error.message });
+  }
+};
+
+
+// Actualizar visibilidad y estado de post
+export const updatePostVisibility = async (req, res) => {
+  const { id } = req.body; // Obtiene el ID del post desde el cuerpo de la solicitud
+  try {
+    const [result] = await pool.query(
+      'UPDATE Posts SET visible = 1, estado = "aprobado" WHERE id = ? AND visible = 0',
+      [id]
+    );
+
+    // Verificar si algún post fue actualizado
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Post no encontrado o ya visible.' });
+    }
+
+    res.status(200).json({ message: 'Visibilidad y estado del post actualizados correctamente.' });
+  } catch (error) {
+    console.error('Error al actualizar la visibilidad y el estado del post:', error);
+    res.status(500).json({ message: 'Error al actualizar la visibilidad y el estado del post.', error: error.message });
+  }
+};
+
+
+
+
+
 // Actualizar un post por ID, incluyendo la subida opcional de imágenes y archivos
 export const updatePostById = async (req, res) => {
   const { id } = req.params;
