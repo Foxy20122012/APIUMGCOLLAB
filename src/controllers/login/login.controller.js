@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { pool } from '../../db.js';
 
-export const login = async (req, res) => {
+export const loginAdmin = async (req, res) => {
     const { correo, contraseña } = req.body;
 
     try {
@@ -17,9 +17,9 @@ export const login = async (req, res) => {
 
         const usuario = rows[0];
 
-        // Comprobar el rol del usuario (solo para fines de demostración)
-        if (usuario.rol !== 'administrador' && usuario.rol !== 'usuario') {
-            return res.status(400).json({ mensaje: 'Rol de usuario no válido' });
+        // Comprobar que el rol sea 'administrador' y que el usuario esté activo
+        if (usuario.rol !== 'administrador' || usuario.activo !== 1) {
+            return res.status(400).json({ mensaje: 'Acceso no autorizado' });
         }
 
         // Comprobar la contraseña

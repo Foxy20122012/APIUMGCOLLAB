@@ -13,7 +13,8 @@ import dataJsonRoute from "./routes/spr/sprJsonRelacional.routes.js"
 import registerRoute from './routes/register/register.routes.js';//Endpoint para registrarse
 
 import linksRoute from './routes/links/links.routes.js';
-// import loginRoute from './routes/login.routes.js';
+ import adminSessionRoute from './routes/login/login.routes.js'; //((Endpoint para la login del administrador))
+
 import loginAdminRoute from './routes/login/loginAdmin.routes.js';//Endpoint para la login del administrador
 import loginUsuarioRoute from './routes/login/loginUsuario.routes.js';//Endpoint para login de los usuarios
 //Registro de rutas Admin
@@ -46,6 +47,9 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // Route universal routes Stored Procedured
 app.use("/api",dataRoute);
 app.use("/api", i18nRoute)
+
+//Routes related to the session
+app.use("/api", adminSessionRoute)
 
 //Routes related to courses
 app.use("/api", dataJsonRoute)
