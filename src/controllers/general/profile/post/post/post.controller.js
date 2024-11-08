@@ -200,7 +200,7 @@ export const getVisibleEventPosts = async (req, res) => {
 export const getVisiblePosts = async (req, res) => {
   try {
     const [rows] = await pool.query(
-      'SELECT * FROM Posts WHERE visible = 0 AND tipo_post = "post"'
+      'SELECT * FROM Posts WHERE visible = 0 AND estado = "pendiente" AND tipo_post = "post"'
     );
     res.status(200).json(rows);
   } catch (error) {
@@ -237,6 +237,123 @@ export const getVisibleEventsPosts = async (req, res) => {
 };
 
 
+
+// Sección para traer todos los Posts, Eventos y Noticias Visibles y Aprobadas
+
+
+//Visibilidad de post
+export const getApprovedPosts = async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM Posts WHERE visible = 1 AND estado = "aprobado" AND tipo_post = "post"'
+    );
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error('Error al obtener los eventos visibles:', error);
+    res.status(500).json({ message: 'Error al obtener los eventos visibles.', error: error.message });
+  }
+};
+
+// Obtener post aprobado por ID
+export const getApprovedPostById = async (req, res) => {
+  const { id } = req.params; // Obtener el ID del post desde los parámetros de la URL
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM Posts WHERE id = ? AND visible = 1 AND estado = "aprobado" AND tipo_post = "post"',
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Post no encontrado o no aprobado.' });
+    }
+
+    res.status(200).json(rows[0]); // Devuelve el primer resultado encontrado
+  } catch (error) {
+    console.error('Error al obtener el post aprobado por ID:', error);
+    res.status(500).json({ message: 'Error al obtener el post aprobado.', error: error.message });
+  }
+};
+
+
+//Visibilidad de noticias
+export const getApprovedNewsPosts = async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM Posts WHERE visible = 1 AND estado = "aprobado" AND tipo_post = "noticia"'
+    );
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error('Error al obtener los eventos visibles:', error);
+    res.status(500).json({ message: 'Error al obtener los eventos visibles.', error: error.message });
+  }
+};
+
+
+// Obtener noticia aprobada por ID
+export const getApprovedNewsPostById = async (req, res) => {
+  const { id } = req.params; // Obtener el ID de la noticia desde los parámetros de la URL
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM Posts WHERE id = ? AND visible = 1 AND estado = "aprobado" AND tipo_post = "noticia"',
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Noticia no encontrada o no aprobada.' });
+    }
+
+    res.status(200).json(rows[0]); // Devuelve la primera noticia encontrada
+  } catch (error) {
+    console.error('Error al obtener la noticia aprobada por ID:', error);
+    res.status(500).json({ message: 'Error al obtener la noticia aprobada.', error: error.message });
+  }
+};
+
+
+
+//Visibilidad de eventos+
+export const getApprovedEventsPosts = async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM Posts WHERE visible = 1 AND estado = "aprobado" AND tipo_post = "evento"' 
+    );
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error('Error al obtener los eventos visibles:', error);
+    res.status(500).json({ message: 'Error al obtener los eventos visibles.', error: error.message });
+  }
+};
+
+
+
+// Obtener evento aprobado por ID
+export const getApprovedEventPostById = async (req, res) => {
+  const { id } = req.params; // Obtener el ID del evento desde los parámetros de la URL
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM Posts WHERE id = ? AND visible = 1 AND estado = "aprobado" AND tipo_post = "evento"',
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Evento no encontrado o no aprobado.' });
+    }
+
+    res.status(200).json(rows[0]); // Devuelve el primer evento encontrado
+  } catch (error) {
+    console.error('Error al obtener el evento aprobado por ID:', error);
+    res.status(500).json({ message: 'Error al obtener el evento aprobado.', error: error.message });
+  }
+};
+
+
+
+
+
+
+
+
+
 // Actualizar visibilidad y estado de post
 export const updatePostVisibility = async (req, res) => {
   const { id } = req.body; // Obtiene el ID del post desde el cuerpo de la solicitud
@@ -255,6 +372,30 @@ export const updatePostVisibility = async (req, res) => {
   } catch (error) {
     console.error('Error al actualizar la visibilidad y el estado del post:', error);
     res.status(500).json({ message: 'Error al actualizar la visibilidad y el estado del post.', error: error.message });
+  }
+};
+
+
+
+
+// Actualizar estado de post a "rechazado"
+export const rejectPost = async (req, res) => {
+  const { id } = req.body; // Obtiene el ID del post desde el cuerpo de la solicitud
+  try {
+    const [result] = await pool.query(
+      'UPDATE Posts SET estado = "rechazado" WHERE id = ? AND estado = "pendiente" AND visible = 0',
+      [id]
+    );
+
+    // Verificar si algún post fue actualizado
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Post no encontrado, ya rechazado, o no cumple con los criterios de actualización.' });
+    }
+
+    res.status(200).json({ message: 'Estado del post actualizado a "rechazado" correctamente.' });
+  } catch (error) {
+    console.error('Error al actualizar el estado del post:', error);
+    res.status(500).json({ message: 'Error al actualizar el estado del post.', error: error.message });
   }
 };
 
