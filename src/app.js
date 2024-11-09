@@ -27,6 +27,7 @@ import EventDetailsRoute from "./routes/admin/categorys/Events.routes.js"
 import RegisterCatedraticosRoute from "./routes/admin/registerProfessors/registerProfessors.routes.js"
 import RegisterStudentRoute from "./routes/admin/registerStudent/registerStudent.routes.js"
 import PostsRoute from "./routes/general/post/post/posts.routes.js"//Endpoint para los post
+import dashboardRoute from "./routes/general/dashboard/dashboard.routes.js"//Endpoint para el dashboard
 
 //Post student
 //import postStudentRoute from "./routes/students/postStudent/postStudent.routes.js"
@@ -47,6 +48,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // Route universal routes Stored Procedured
 app.use("/api",dataRoute);
 app.use("/api", i18nRoute)
+app.use("/api", dashboardRoute)
 
 //Routes related to the session
 app.use("/api", adminSessionRoute)
